@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace Lox;
+﻿namespace Lox;
 
 public class Lox {
     public static bool hadError = false;
@@ -25,6 +23,7 @@ public class Lox {
         }
         catch (FileNotFoundException) {
             Console.WriteLine($"{path} not found!");
+            hadError = true;
         }
         if (hadError) Environment.Exit(65);
     }

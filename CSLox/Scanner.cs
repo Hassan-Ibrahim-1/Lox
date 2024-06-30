@@ -73,6 +73,9 @@ public class Scanner {
                     // Not using match because it increments when encountering a new line
                     while (Peek() != '\n' && !IsAtEnd()) Next();
                 }
+                else if (Match('*')) {
+                    MultiLineComment();
+                }
                 else {
                     AddToken(TokenType.Slash);
                 }
@@ -151,6 +154,20 @@ public class Scanner {
         }
 
         AddToken(type);
+    }
+
+    private void MultiLineComment() {
+        int nestLevel = 1;
+
+        while (!IsAtEnd() && nestLevel > 0) {
+            if (Peek() == '/' && Match('*')) {
+                nestLevel++;
+            }
+            else if (Peek() == '*' && Match('/')) {
+                nestLevel--;
+            }
+            Next();
+        }
     }
 
     // Only consume a character if its the expected value
