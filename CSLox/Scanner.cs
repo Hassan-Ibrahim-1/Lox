@@ -7,6 +7,25 @@ public class Scanner {
     private int _current = 0; // current char of the lexeme being scanned
     private int _line = 1; // Used to figure out the exact location of the token
 
+    private static readonly Dictionary<string, TokenType> _keywords = new Dictionary<string, TokenType>() {
+        { "and",    TokenType.And },
+        { "or",     TokenType.Or },
+        { "if",     TokenType.If },
+        { "else",   TokenType.Else },
+        { "true",   TokenType.True },
+        { "false",  TokenType.False },
+        { "class",  TokenType.Class },
+        { "fun",    TokenType.Fun },
+        { "for",    TokenType.For },
+        { "nil",    TokenType.Nil },
+        { "print",  TokenType.Print },
+        { "return", TokenType.Return },
+        { "super",  TokenType.Super },
+        { "this",   TokenType.This },
+        { "var",    TokenType.Var },
+        { "while",  TokenType.While },
+    };
+
     public Scanner (string source) {
         this._source = source;
     }
@@ -51,24 +70,87 @@ public class Scanner {
             case '/':
                 if (Match('/')) {
                     // comment is not a token
-                    while (peek() != '\n' && !IsAtEnd()) Next();
+                    // Not using match because it increments when encountering a new line
+                    while (Peek() != '\n' && !IsAtEnd()) Next();
                 }
                 else {
                     AddToken(TokenType.Slash);
                 }
                 break;
+
             case ' ':
             case '\r':
             case '\t':
                 break;
+
             case '\n':
                 _line++;
                 break;
 
+            // Literals
+            case '"':
+                AddString();
+                break;
+
             default:
-                Lox.Error(_line, "Unexpected Character");
+                if (IsDigit(c)) {
+                    AddNumber();
+                }
+                else if (IsAlpha(c)) {
+                    AddIdentifier();
+                }
+                else {
+                    Lox.Error(_line, "Unexpected Character");
+                }
                 break;
         }
+    }
+
+    private void AddString() {
+        while (Peek() != '"' && !IsAtEnd()) {
+            if (Peek() == '\n') {
+                _line++;
+            }
+            Next();
+        }
+        if (IsAtEnd()) {
+            Lox.Error(_line, "String not terminated.");
+            return;
+        }
+
+        Next(); // move on from the ending "
+        
+        // Trim quotes
+        string literal = _source.Substring(_start + 1, _current - _start - 2);
+        AddToken(TokenType.String, literal);
+    }
+
+    private void AddNumber() {
+        while (IsDigit(Peek())) Next();
+
+        if (Peek() == '.' && IsDigit(PeekNext())) {
+            Next(); // Consume the .
+
+            while (IsDigit(Peek())) Next();
+        }
+        AddToken(TokenType.Number, Double.Parse(_source.Substring(_start, _current - _start)));
+    }
+
+    private void AddIdentifier() {
+        while (IsAlphaNumeric(Peek())) Next();
+
+        string lexeme = _source.Substring(_start, _current - _start);
+        TokenType type;
+
+        if (_keywords.ContainsKey(lexeme)) {
+            type = _keywords[lexeme];
+        }
+        else {
+            // User defined identifer
+            type = TokenType.Identifier;
+        }
+
+        AddToken(type);
     }
 
     // Only consume a character if its the expected value
@@ -80,13 +162,32 @@ public class Scanner {
         return true;
     }
     
-    private char peek() {
+    private char Peek() {
         if (IsAtEnd()) return '\0';
         return _source[_current];
     }
 
+    private char PeekNext() {
+        if (_current + 1 >= _source.Length) return '\0';
+        return _source[_current+1];
+    }
+
     private bool IsAtEnd() {
         return _current >= _source.Length;
+    }
+
+    private bool IsDigit(char c) {
+        return c >= '0' && c <= '9';
+    }
+
+    private bool IsAlpha(char c) {
+        return (c >= 'a' && c <= 'z') ||
+               (c >= 'A' && c <= 'Z') ||
+               (c == '_');
+    }
+
+    private bool IsAlphaNumeric(char c) {
+        return IsDigit(c) || IsAlpha(c);
     }
 
     private char Next() {

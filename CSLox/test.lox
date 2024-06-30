@@ -1,0 +1,16 @@
+var language = "lox";
+var number = 123;
+
+if (number > 0) {
+    print "number is greater than 0";
+}
+
+// This is a comment
+fun foo() {
+    print "foo called";
+}
+
+class TestClass {
+    
+}
+
