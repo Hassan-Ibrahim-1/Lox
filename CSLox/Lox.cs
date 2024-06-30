@@ -16,7 +16,6 @@ public class Lox {
         }
     }
     private static void RunFile(string path) {
-//        byte[] bytes = File.ReadAllBytes(Path.GetFullPath(path));
         try {
             StreamReader sr = new StreamReader(Path.GetFullPath(path));
             Run(sr.ReadToEnd());
