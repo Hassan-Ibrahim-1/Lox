@@ -13,10 +13,12 @@ fun foo() {
 /*
     This is a multi-line comment
     /*
+        /*
         This is a nested multi-line comment
     */
+    */
 */
-
+^
 class TestClass {
     
 }

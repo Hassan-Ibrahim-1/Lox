@@ -160,10 +160,16 @@ public class Scanner {
         int nestLevel = 1;
 
         while (!IsAtEnd() && nestLevel > 0) {
-            if (Peek() == '/' && Match('*')) {
+            if (Peek() == '\n') {
+                Console.Write("new line");
+                _line++;
+            }
+            else if (Peek() == '/' && MatchNext('*')) {
+                Console.Write(Next());
                 nestLevel++;
             }
-            else if (Peek() == '*' && Match('/')) {
+            else if (Peek() == '*' && MatchNext('/')) {
+                Next();
                 nestLevel--;
             }
             Next();
@@ -174,6 +180,14 @@ public class Scanner {
     private bool Match(char expected) {
         if (IsAtEnd()) return false;
         if (_source[_current] != expected) return false;
+
+        _current++;
+        return true;
+    }
+
+    private bool MatchNext(char expected) {
+        if (_current + 1 >= _source.Length) return false;
+        if (_source[_current+1] != expected) return false;
 
         _current++;
         return true;
