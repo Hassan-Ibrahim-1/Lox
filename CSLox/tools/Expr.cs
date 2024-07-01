@@ -1,4 +1,4 @@
-using Lox;
+namespace Lox;
 
 public interface IVisitor<R> {
     R VisitBinaryExpr(Binary expr);
@@ -8,7 +8,7 @@ public interface IVisitor<R> {
 }
 
 public abstract class Expr {
-    public abstract R accept<R>(IVisitor<R> visitor);
+    public abstract R Accept<R>(IVisitor<R> visitor);
 }
 
 public class Binary : Expr {
@@ -21,7 +21,7 @@ public class Binary : Expr {
         this.op = op;
         this.right = right;
     }
-    public override R accept<R>(IVisitor<R> visitor) {
+    public override R Accept<R>(IVisitor<R> visitor) {
         return visitor.VisitBinaryExpr(this);
     }
 }
@@ -31,7 +31,7 @@ public class Grouping : Expr {
     public Grouping(Expr expression) {
         this.expression = expression;
     }
-    public override R accept<R>(IVisitor<R> visitor) {
+    public override R Accept<R>(IVisitor<R> visitor) {
         return visitor.VisitGroupingExpr(this);
     }
 }
@@ -41,7 +41,7 @@ public class Literal : Expr {
     public Literal(object value) {
         this.value = value;
     }
-    public override R accept<R>(IVisitor<R> visitor) {
+    public override R Accept<R>(IVisitor<R> visitor) {
         return visitor.VisitLiteralExpr(this);
     }
 }
@@ -53,7 +53,7 @@ public class Unary : Expr {
         this.op = op;
         this.right = right;
     }
-    public override R accept<R>(IVisitor<R> visitor) {
+    public override R Accept<R>(IVisitor<R> visitor) {
         return visitor.VisitUnaryExpr(this);
     }
 }
