@@ -19,9 +19,17 @@ public class GenerateAST {
         string path = $"{outputDir}/{baseName}.cs";
         StreamWriter writer = new StreamWriter(path);
 
-        writer.WriteLine("namespace Lox;");
+        writer.WriteLine("using Lox;");
         writer.WriteLine();
-        writer.WriteLine($"public abstract class {baseName} {{}}"); 
+
+        DefineVisitor(writer, baseName, types);
+
+        writer.WriteLine($"public abstract class {baseName} {{"); 
+
+        writer.WriteLine("    public abstract R accept<R>(IVisitor<R> visitor);");
+
+        writer.WriteLine('}');
+
         writer.WriteLine();
 
         foreach(string type in types) {
@@ -33,10 +41,20 @@ public class GenerateAST {
         writer.Close();
     }
 
+    private static void DefineVisitor(StreamWriter writer, string baseName, List<string> types) {
+        writer.WriteLine($"public interface IVisitor<R> {{");
+
+        foreach (string type in types) {
+            string typeName = type.Split(':')[0].Trim();
+            writer.WriteLine($"    R Visit{typeName}{baseName}({typeName} {baseName.ToLower()});");
+        }
+
+        writer.WriteLine("}");
+        writer.WriteLine();
+    }
+
     private static void DefineType(StreamWriter writer, string baseName, string className, string fieldList) {
         writer.WriteLine($"public class {className} : {baseName} {{");
-        
-        // constructor
 
         // declare fields
         string[] fields = fieldList.Split(", ");
@@ -52,6 +70,11 @@ public class GenerateAST {
             writer.WriteLine($"        this.{name} = {name};");
         }
         writer.WriteLine("    }");
+
+        writer.WriteLine("    public override R accept<R>(IVisitor<R> visitor) {");
+        writer.WriteLine($"        return visitor.Visit{className}{baseName}(this);");
+        writer.WriteLine("    }");
+
         writer.WriteLine("}");
     }
 }
