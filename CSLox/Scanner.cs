@@ -43,8 +43,8 @@ public class Scanner {
         char c = Next();
 
         switch (c) {
-            case '(': AddToken(TokenType.Right_Paren); break;
-            case ')': AddToken(TokenType.Left_Paren); break;
+            case '(': AddToken(TokenType.Left_Paren); break;
+            case ')': AddToken(TokenType.Right_Paren); break;
             case '{': AddToken(TokenType.Left_Brace); break;
             case '}': AddToken(TokenType.Right_Brace); break;
             case ',': AddToken(TokenType.Comma); break;
@@ -173,6 +173,9 @@ public class Scanner {
                 nestLevel--;
             }
             Next();
+        }
+        if (IsAtEnd()) {
+            Lox.Error(_line, "Multiline comment not closed.");
         }
     }
 

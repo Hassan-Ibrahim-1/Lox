@@ -4,7 +4,7 @@ namespace Lox;
 
 public class AstPrinter : IVisitor<string> {
 
-    string Print(Expr expr) {
+    public string Print(Expr expr) {
         // expr can be any child
         return expr.Accept(this);
     }

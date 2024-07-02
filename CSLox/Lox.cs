@@ -42,14 +42,25 @@ public class Lox {
     private static void Run(string source) {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.ScanTokens();
+        Parser parser = new Parser(tokens);
+        Expr expression = parser.Parse();
 
-        foreach (Token token in tokens) {
-            Console.WriteLine(token);
-        }
+        if (hadError) return;
+        AstPrinter printer = new AstPrinter();
+        Console.WriteLine(printer.Print(expression));
     } 
     
-    public static void Error(int line, String message) {
+    public static void Error(int line, string message) {
         Report(line, "", message);
+    }
+
+    public static void Error(Token token, string message) {
+        if (token.type == TokenType.EOF) {
+            Report(token.line, "at end", message);
+        }
+        else {
+            Report(token.line, token.lexeme, message);
+        }
     }
 
     private static void Report(int line, string location, string message) {
