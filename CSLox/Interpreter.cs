@@ -46,17 +46,18 @@ public class Interpreter : IVisitor<object> {
                 if (left is double && right is double) {
                     return (double)left + (double)right;
                 }
-                if (left is string && right is string) {
-                    return (string)left + (string)right;
+                if (left is string || right is string) {
+                    return left.ToString() + right.ToString();
                 }
-
                 throw new RuntimeError(expr.op, "Operands must be two numbers or two strings");
             case TokenType.Slash:
                 CheckNumberOperands(expr.op, left, right);
+                CheckDivisionByZero(expr.op, right);
                 return (double)left / (double)right;
             case TokenType.Star:
                 CheckNumberOperands(expr.op, left, right);
                 return (double)left * (double)right;
+
             case TokenType.Greater:
                 CheckNumberOperands(expr.op, left, right);
                 return (double)left > (double)right;
@@ -94,7 +95,7 @@ public class Interpreter : IVisitor<object> {
             }
             return text;
         }
-        return obj.ToString()!;
+        return obj.ToString()!.ToLower();
     }
 
     private static void CheckNumberOperand(Token op, object operand) {
@@ -102,9 +103,17 @@ public class Interpreter : IVisitor<object> {
         throw new RuntimeError(op, "Operand must be a number.");
     }
 
+    private static void CheckDivisionByZero(Token op, object right) {
+        if (right is double n) {
+            if (n == 0) {
+                throw new RuntimeError(op, "Division by zero error.");
+            }
+        }
+    }
+
     private static void CheckNumberOperands(Token op, object left, object right) {
         if (left is double && right is double) return;
-        throw new RuntimeError(op, "Operands must be number");
+        throw new RuntimeError(op, "Operands must be numbers");
     }
 
     private object Evaluate(Expr expr) {
