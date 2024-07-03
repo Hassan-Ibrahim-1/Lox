@@ -22,7 +22,23 @@ public class Parser {
     }
 
     private Expr Expression() {
-        return Equality();
+        return Ternary();
+    }
+
+    private Expr Ternary() {
+        Expr expr = Equality();
+        while(Match(TokenType.Ternary_Question)) {
+            Token ternaryOper = Previous();
+            Expr trueChoice = Equality();
+            Consume(TokenType.Ternary_Colon, "Expect ':' after ternary conditional.");
+            Token ternaryColon = Previous();
+            Expr falseChoice = Equality();
+
+            Expr right = new Binary(trueChoice, ternaryColon, falseChoice);
+            expr = new Binary(new Grouping(expr), ternaryOper, right);
+        }
+
+        return expr;
     }
 
     private Expr Equality() {

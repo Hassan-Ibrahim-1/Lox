@@ -8,6 +8,7 @@ public enum TokenType {
     // One or two character tokens
     Bang, Bang_Equal, Equal, Equal_Equal,
     Greater, Greater_Equal, Less, Less_Equal,
+    Ternary_Question, Ternary_Colon,
 
     // Identifiers
     Identifier, String, Number,
