@@ -108,6 +108,12 @@ public class Parser {
             Consume(TokenType.Right_Paren, "Expect ')' after expression.");
             return new Grouping(expr);
         }
+        if (Match(TokenType.Plus, TokenType.Minus, TokenType.Star, TokenType.Slash)) {
+            Token oper = Previous();
+            Error(oper, "Expect left operand");
+            Expression();
+
+        }
         // No valid expression found
         throw Error(Peek(), "Expect expression.");
     }
