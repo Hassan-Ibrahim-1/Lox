@@ -3,7 +3,7 @@ namespace Lox;
 public class Parser {
     private class ParseError : Exception {}
 
-    private List<Token> _tokens;
+    private readonly List<Token> _tokens;
     private int _current = 0;
     
 
