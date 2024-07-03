@@ -43,11 +43,11 @@ public class Lox {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.ScanTokens();
         Parser parser = new Parser(tokens);
-        Expr expression = parser.Parse();
+        Expr expr = parser.Parse();
 
         if (hadError) return;
         AstPrinter printer = new AstPrinter();
-        Console.WriteLine(printer.Print(expression));
+        Console.WriteLine(printer.Print(expr));
     } 
     
     public static void Error(int line, string message) {

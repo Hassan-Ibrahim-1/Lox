@@ -3,7 +3,7 @@ namespace Lox;
 public class Parser {
     private class ParseError : Exception {}
 
-    private readonly List<Token> _tokens;
+    private List<Token> _tokens;
     private int _current = 0;
     
 
@@ -22,7 +22,18 @@ public class Parser {
     }
 
     private Expr Expression() {
-        return Equality();
+        return Comma();
+    }
+
+    private Expr Comma() {
+        Expr expr = Equality();
+
+        while(Match(TokenType.Comma)) {
+            Token oper = Previous();
+            Expr right = Equality();
+            expr = new Binary(expr, oper, right);
+        }
+        return expr;
     }
 
     private Expr Equality() {
