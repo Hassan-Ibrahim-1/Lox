@@ -110,8 +110,12 @@ public class Parser {
         }
         if (Match(TokenType.Plus, TokenType.Minus, TokenType.Star, TokenType.Slash)) {
             Token oper = Previous();
-            Error(oper, "Expect left operand");
-            Expression();
+            try {
+                Expression();
+            }
+            catch (ParseError) {}
+            
+            throw Error(oper, "Expect left operand");
 
         }
         // No valid expression found
