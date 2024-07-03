@@ -77,20 +77,20 @@ public class Parser {
     }
 
     private Expr Factor() {
-        Expr expr = Unary();
+        Expr expr = UnaryExpr();
         
         while (Match(TokenType.Slash, TokenType.Star)) {
             Token oper = Previous();
-            Expr right = Unary();
+            Expr right = UnaryExpr();
             expr = new Binary(expr, oper, right);
         }
         return expr;
     }
 
-    private Expr Unary() {
+    private Expr UnaryExpr() {
         if (Match(TokenType.Bang, TokenType.Minus)) {
             Token oper = Previous();
-            Expr right = Unary();
+            Expr right = Expression();
             return new Unary(oper, right);
         }
         return Primary();

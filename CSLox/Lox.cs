@@ -1,7 +1,10 @@
 ﻿namespace Lox;
 
 public class Lox {
+    public static readonly Interpreter interpreter = new Interpreter();
+
     public static bool hadError = false;
+    public static bool hadRuntimeError = false;
 
     public static void Main(string[] args) {
         if (args.Length > 1) {
@@ -25,6 +28,7 @@ public class Lox {
             hadError = true;
         }
         if (hadError) Environment.Exit(65);
+        if (hadRuntimeError) Environment.Exit(70);
     }
 
     private static void RunPrompt() {
@@ -46,8 +50,7 @@ public class Lox {
         Expr expression = parser.Parse();
 
         if (hadError) return;
-        AstPrinter printer = new AstPrinter();
-        Console.WriteLine(printer.Print(expression));
+        interpreter.Interpret(expression);
     } 
     
     public static void Error(int line, string message) {
@@ -61,6 +64,11 @@ public class Lox {
         else {
             Report(token.line, token.lexeme, message);
         }
+    }
+
+    public static void RuntimeError(RuntimeError e) {
+        Console.WriteLine($"{e.Message}\n[line {e.token.line} ]");
+        hadRuntimeError = true;
     }
 
     private static void Report(int line, string location, string message) {

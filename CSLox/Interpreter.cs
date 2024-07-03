@@ -1,0 +1,113 @@
+namespace Lox;
+
+public class Interpreter : IVisitor<object> {
+
+    public void Interpret(Expr expression) {
+        try {
+            object value = Evaluate(expression);
+            Console.WriteLine(Stringify(value));
+        }
+        catch (RuntimeError e) {
+            Lox.RuntimeError(e);
+        }
+    }
+
+    public object VisitLiteralExpr(Literal expr) {
+        return expr.value;
+    }
+
+    public object VisitGroupingExpr(Grouping expr) {
+        return Evaluate(expr.expression);
+    }
+
+    public object VisitUnaryExpr(Unary expr) {
+        object right = Evaluate(expr.right);
+
+        switch (expr.op.type) {
+            case TokenType.Bang:
+                return !IsTrue(right);
+            case TokenType.Minus:
+                CheckNumberOperand(expr.op, right); 
+                return -(double)right;
+        }
+
+        return null!; // Never reached
+    }
+
+    public object VisitBinaryExpr(Binary expr) {
+        object left = Evaluate(expr.left);
+        object right = Evaluate(expr.right);
+
+        switch(expr.op.type) {
+            case TokenType.Minus:
+                CheckNumberOperands(expr.op, left, right);
+                return (double)left - (double)right;
+            case TokenType.Plus:
+                if (left is double && right is double) {
+                    return (double)left + (double)right;
+                }
+                if (left is string && right is string) {
+                    return (string)left + (string)right;
+                }
+
+                throw new RuntimeError(expr.op, "Operands must be two numbers or two strings");
+            case TokenType.Slash:
+                CheckNumberOperands(expr.op, left, right);
+                return (double)left / (double)right;
+            case TokenType.Star:
+                CheckNumberOperands(expr.op, left, right);
+                return (double)left * (double)right;
+            case TokenType.Greater:
+                CheckNumberOperands(expr.op, left, right);
+                return (double)left > (double)right;
+            case TokenType.Greater_Equal:
+                CheckNumberOperands(expr.op, left, right);
+                return (double)left >= (double)right;
+            case TokenType.Less:
+                CheckNumberOperands(expr.op, left, right);
+                return (double)left < (double)right;
+            case TokenType.Less_Equal:
+                CheckNumberOperands(expr.op, left, right);
+               return (double)left <= (double)right;
+            case TokenType.Equal_Equal:
+               return left.Equals(right);
+            case TokenType.Bang_Equal:
+               return !left.Equals(right);
+        }
+
+        return null!; // Unreachable
+    }
+
+    private static bool IsTrue(object obj) {
+        if (obj == null) return false;
+        if (obj is bool) return (bool)obj;
+        return true;
+    }
+    
+    private static string Stringify(object obj) {
+        if (obj == null) return "nil";
+
+        if (obj is double) {
+            string text = obj.ToString()!;
+            if (text.EndsWith(".0")) {
+                text = text.Substring(0, text.Length-2);
+            }
+            return text;
+        }
+        return obj.ToString()!;
+    }
+
+    private static void CheckNumberOperand(Token op, object operand) {
+        if (operand is double) return;
+        throw new RuntimeError(op, "Operand must be a number.");
+    }
+
+    private static void CheckNumberOperands(Token op, object left, object right) {
+        if (left is double && right is double) return;
+        throw new RuntimeError(op, "Operands must be number");
+    }
+
+    private object Evaluate(Expr expr) {
+        return expr.Accept(this);
+    }
+}
