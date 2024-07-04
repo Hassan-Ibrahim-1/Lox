@@ -3,8 +3,11 @@ namespace Lox;
 public class Environment {
     private readonly Dictionary<string, object> values = new Dictionary<string, object>();
 
-    public void Define(string name, object value) {
-        values.Add(name, value);
+    public void Define(Token token, object value) {
+        if (values.ContainsKey(token.lexeme)) {
+            throw new RuntimeError(token, $"Variable '{token.lexeme}' has already been defined");
+        }
+        values.Add(token.lexeme, value);
     }
 
     public object Get(Token token) {

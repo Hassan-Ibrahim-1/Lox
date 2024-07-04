@@ -34,12 +34,13 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         if (stmt.initializer != null) {
             value = Evaluate(stmt.initializer);
         }
-        environment.Define(stmt.name.lexeme, value);
+        environment.Define(stmt.name, value);
         return null!;
     }
 
     // Using the variable in an expression
     public object VisitVariableExpr(Variable expr) {
+        // Replace the name with the actual value
         return environment.Get(expr.name);
     }
 
