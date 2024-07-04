@@ -1,15 +1,29 @@
 namespace Lox;
 
-public class Interpreter : IVisitor<object> {
+// IStmtVisitor here just returns null all the time
+public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
 
-    public void Interpret(Expr expression) {
+   public void Interpret(List<Stmt> stmts) {
+
         try {
-            object value = Evaluate(expression);
-            Console.WriteLine(Stringify(value));
+            foreach (Stmt stmt in stmts) {
+                Execute(stmt);
+            }
         }
         catch (RuntimeError e) {
             Lox.RuntimeError(e);
         }
+    }
+
+    public object VisitExpressionStmt(Expression stmt) {
+        Evaluate(stmt.expression);
+        return null!;
+    }
+
+    public object VisitPrintStmt(Print stmt) {
+        object value = Evaluate(stmt.expression);
+        Console.WriteLine(Stringify(value));
+        return null!;
     }
 
     public object VisitLiteralExpr(Literal expr) {
@@ -118,5 +132,9 @@ public class Interpreter : IVisitor<object> {
 
     private object Evaluate(Expr expr) {
         return expr.Accept(this);
+    }
+
+    private void Execute(Stmt stmt) {
+        stmt.Accept(this);
     }
 }

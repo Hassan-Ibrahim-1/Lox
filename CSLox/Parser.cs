@@ -11,14 +11,31 @@ public class Parser {
         this._tokens = tokens;
     }
 
-    public Expr Parse() {
-        try {
-            // Starts parsing the epxression
-            return Expression();
+    public List<Stmt> Parse() {
+        List<Stmt> statements = new List<Stmt>();
+
+        while (!IsAtEnd()) {
+            statements.Add(Statement());
         }
-        catch(ParseError) {
-            return null!;
-        }
+
+        return statements;
+    }
+
+    private Stmt Statement() {
+        if (Match(TokenType.Print)) return PrintStatement();
+        return ExpressionStatement();
+    }
+
+    private Stmt PrintStatement() {
+        Expr value = Expression();
+        Consume(TokenType.SemiColon, "Expect ';' after expression.");
+        return new Print(value);
+    }
+
+    private Stmt ExpressionStatement() {
+         Expr expr = Expression();
+         Consume(TokenType.SemiColon, "Expect ';' after expression");
+         return new Expression(expr);
     }
 
     private Expr Expression() {

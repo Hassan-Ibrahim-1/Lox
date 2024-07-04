@@ -12,14 +12,18 @@ public class GenerateAST {
                 "Grouping : Expr expression",
                 "Literal : object value",
                 "Unary : Token op, Expr right"
-                });
+            });
+        DefineAST(outputDir, "Stmt", new List<string>() {
+                "Expression : Expr expression",
+                "Print : Expr expression"
+            });
     }
 
     private static void DefineAST(string outputDir, string baseName, List<string> types) {
         string path = $"{outputDir}/{baseName}.cs";
         StreamWriter writer = new StreamWriter(path);
+        writer.WriteLine("namespace Lox;");
 
-        writer.WriteLine("using Lox;");
         writer.WriteLine();
 
         DefineVisitor(writer, baseName, types);
