@@ -38,6 +38,12 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         return null!;
     }
 
+    public object VisitAssignmentExpr(Assignment stmt) {
+        object value = Evaluate(stmt.value);
+        environment.Assign(stmt.name, value);
+        return value;
+    }
+
     // Using the variable in an expression
     public object VisitVariableExpr(Variable expr) {
         // Replace the name with the actual value

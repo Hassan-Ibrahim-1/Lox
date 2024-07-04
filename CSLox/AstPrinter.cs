@@ -10,7 +10,11 @@ public class AstPrinter : IVisitor<string> {
     }
 
     public string VisitVariableExpr(Variable expr) {
-        return Parenthesize("Var", expr);
+        return expr.name.lexeme;
+    }
+
+    public string VisitAssignmentExpr(Assignment expr) {
+        return expr.value.ToString()!;
     }
 
     public string VisitBinaryExpr(Binary expr) {

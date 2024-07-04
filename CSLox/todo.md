@@ -1,2 +1,9 @@
-1. figure out how to nest ternarys
--- 2. make ternary operators left associative (the conditional is evaluated first)
+1. Create a new ternary Expr class.
+    - Expr conditional
+    - Expr trueChoice
+    - Expr falseChoice
+
+2. Create a new comma Expr class.
+    - Expr left
+    - Expr right
+

@@ -61,13 +61,32 @@ public class Parser {
     }
 
     private Expr Expression() {
-        return Ternary();
+        return Assignment();
+    }
+
+    private Expr Assignment() {
+        Expr expr = Ternary(); // variable name if an assignment expression
+
+        // Not using a while loop becaues assignment is right associative
+        if (Match((TokenType.Equal))) {
+            Token equals = Previous(); // For error handling
+
+            // The right side could be a non assignment expression or an assignment expression
+            // Also why an if statement is used and not a while loop
+            Expr value = Assignment();
+            if (expr is Variable variable) {
+                return new Assignment(variable.name, value);
+            }
+            Error(equals, "Invalid assignment target.");
+        }
+        return expr;
     }
 
     private Expr Ternary() {
         Expr expr = Equality();
         while(Match(TokenType.Ternary_Question)) {
             Token ternaryOper = Previous();
+            // Maybe call ternary instead
             Expr trueChoice = Equality();
             Consume(TokenType.Ternary_Colon, "Expect ':' after ternary conditional.");
             Token ternaryColon = Previous();

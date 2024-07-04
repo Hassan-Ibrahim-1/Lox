@@ -12,7 +12,8 @@ public class GenerateAST {
                 "Grouping : Expr expression",
                 "Literal : object value",
                 "Unary : Token op, Expr right",
-                "Variable : Token name"
+                "Variable : Token name",
+                "Assignment : Token name, Expr value",
             });
         DefineAST(outputDir, "Stmt", new List<string>() {
                 "Expression : Expr expression",
