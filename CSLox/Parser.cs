@@ -15,10 +15,32 @@ public class Parser {
         List<Stmt> statements = new List<Stmt>();
 
         while (!IsAtEnd()) {
-            statements.Add(Statement());
+            statements.Add(Declaration());
         }
 
         return statements;
+    }
+
+    private Stmt Declaration() {
+        try {
+            if (Match(TokenType.Var)) return VarDeclaration();
+            return Statement();
+        }
+        catch (ParseError) {
+            Synchronize();
+            return null!;
+        }
+    }
+
+    private Stmt VarDeclaration() {
+        Token name = Consume(TokenType.Identifier, "Expect variable name.");
+
+        Expr initializer = null!;
+        if (Match(TokenType.Equal)) {
+            initializer = Expression();
+        }
+        Consume(TokenType.SemiColon, "Expect ';' after variable declaration");
+        return new Var(name, initializer);
     }
 
     private Stmt Statement() {
@@ -119,6 +141,10 @@ public class Parser {
         if (Match(TokenType.Nil)) return new Literal(null!);
         if (Match(TokenType.String, TokenType.Number)) {
             return new Literal(Previous().literal);
+        }
+        if (Match(TokenType.Identifier)) {
+            // The identifier that just got matched
+            return new Variable(Previous());
         }
         if (Match(TokenType.Left_Paren)) {
             Expr expr = Expression();

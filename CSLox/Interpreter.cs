@@ -2,6 +2,8 @@ namespace Lox;
 
 // IStmtVisitor here just returns null all the time
 public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
+    // TODO: check if this can be made readonly
+    private Environment environment = new Environment();
 
    public void Interpret(List<Stmt> stmts) {
 
@@ -24,6 +26,21 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         object value = Evaluate(stmt.expression);
         Console.WriteLine(Stringify(value));
         return null!;
+    }
+
+    // Definition
+    public object VisitVarStmt(Var stmt) {
+        object value = null!;
+        if (stmt.initializer != null) {
+            value = Evaluate(stmt.initializer);
+        }
+        environment.Define(stmt.name.lexeme, value);
+        return null!;
+    }
+
+    // Using the variable in an expression
+    public object VisitVariableExpr(Variable expr) {
+        return environment.Get(expr.name);
     }
 
     public object VisitLiteralExpr(Literal expr) {

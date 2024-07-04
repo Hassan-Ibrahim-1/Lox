@@ -9,6 +9,10 @@ public class AstPrinter : IVisitor<string> {
         return expr.Accept(this);
     }
 
+    public string VisitVariableExpr(Variable expr) {
+        return Parenthesize("Var", expr);
+    }
+
     public string VisitBinaryExpr(Binary expr) {
         return Parenthesize(expr.op.lexeme, expr.left, expr.right);
     }

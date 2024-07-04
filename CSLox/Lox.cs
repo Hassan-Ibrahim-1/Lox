@@ -9,7 +9,7 @@ public class Lox {
     public static void Main(string[] args) {
         if (args.Length > 1) {
             Console.WriteLine("Usage: cslox [script]");
-            Environment.Exit(64);
+            System.Environment.Exit(64);
         }
         else if (args.Length == 1) {
             RunFile(args[0]);
@@ -27,8 +27,8 @@ public class Lox {
             Console.WriteLine($"{path} not found!");
             hadError = true;
         }
-        if (hadError) Environment.Exit(65);
-        if (hadRuntimeError) Environment.Exit(70);
+        if (hadError) System.Environment.Exit(65);
+        if (hadRuntimeError) System.Environment.Exit(70);
     }
 
     private static void RunPrompt() {
