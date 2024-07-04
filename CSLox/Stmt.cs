@@ -2,6 +2,7 @@ namespace Lox;
 
 public interface IStmtVisitor<R> {
     R VisitExpressionStmt(Expression stmt);
+    R VisitBlockStmt(Block stmt);
     R VisitPrintStmt(Print stmt);
     R VisitVarStmt(Var stmt);
 }
@@ -18,6 +19,16 @@ public class Expression : Stmt {
     }
     public override R Accept<R>(IStmtVisitor<R> visitor) {
         return visitor.VisitExpressionStmt(this);
+    }
+}
+public class Block : Stmt {
+    public readonly List<Stmt> statements;
+
+    public Block(List<Stmt> statements) {
+        this.statements = statements;
+    }
+    public override R Accept<R>(IStmtVisitor<R> visitor) {
+        return visitor.VisitBlockStmt(this);
     }
 }
 public class Print : Stmt {

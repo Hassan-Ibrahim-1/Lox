@@ -17,6 +17,7 @@ public class GenerateAST {
             });
         DefineAST(outputDir, "Stmt", new List<string>() {
                 "Expression : Expr expression",
+                "Block : List<Stmt> statements",
                 "Print : Expr expression",
                 "Var : Token name, Expr initializer"
             });

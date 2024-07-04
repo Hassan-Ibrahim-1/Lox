@@ -2,7 +2,7 @@ namespace Lox;
 
 // IStmtVisitor here just returns null all the time
 public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
-    // TODO: check if this can be made readonly
+    // current environment, not necessarily global
     private Environment environment = new Environment();
 
    public void Interpret(List<Stmt> stmts) {
@@ -35,6 +35,11 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
             value = Evaluate(stmt.initializer);
         }
         environment.Define(stmt.name, value);
+        return null!;
+    }
+
+    public object VisitBlockStmt(Block stmt) {
+        ExecuteBlock(stmt.statements, new Environment(environment));
         return null!;
     }
 
@@ -160,5 +165,21 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
 
     private void Execute(Stmt stmt) {
         stmt.Accept(this);
+    }
+    
+    private void ExecuteBlock(List<Stmt> statements, Environment environment) {
+        Environment previous = this.environment;
+
+        try {
+            // Change environment for every method so that variable declarations only exist in that environment
+            this.environment = environment;
+            
+            foreach(Stmt stmt in statements) {
+                Execute(stmt);
+            }
+        }
+        finally {
+            this.environment = previous; // Eventually gets set back to the global environment
+        }
     }
 }

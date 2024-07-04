@@ -1,4 +1,13 @@
 print "Hello World!";
-print true;
-print nil;
-print 2 + 1 * 3;
+
+var a = "global a";
+
+{
+    var a = "local a";
+    print a;
+    {
+        var a = "inner a";
+        print a;
+    }
+}
+print a;
