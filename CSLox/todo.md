@@ -7,3 +7,6 @@
     - Expr left
     - Expr right
 
+3. Disallow variable use without assigning it to something.
+    - A Nil class that means nil in lox. null would represent an unassigned variable
+

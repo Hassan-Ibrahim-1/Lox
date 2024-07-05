@@ -178,7 +178,7 @@ public class Parser {
     private Expr Primary() {
         if (Match(TokenType.False)) return new Literal(false);
         if (Match(TokenType.True)) return new Literal(true);
-        if (Match(TokenType.Nil)) return new Literal(null!);
+        if (Match(TokenType.Nil)) return new Literal(new Nil());
         if (Match(TokenType.String, TokenType.Number)) {
             return new Literal(Previous().literal);
         }

@@ -1,5 +1,6 @@
 namespace Lox;
 
+
 public class Environment {
     private readonly Dictionary<string, object> values = new Dictionary<string, object>();
     public readonly Environment enclosing;
@@ -17,7 +18,10 @@ public class Environment {
 
     public object Get(Token name) {
         if (values.ContainsKey(name.lexeme)) {
-            return values[name.lexeme];
+            if (values[name.lexeme] != null) {
+                return values[name.lexeme];
+            }
+            throw new RuntimeError(name, $"Variable '{name.lexeme}' has not been assigned to any value.");
         }
         
         // When it reaches global scope and the variable isn't found the runtime error is thrown
@@ -32,6 +36,7 @@ public class Environment {
             return;
         }
         
+        // Assign to any matching variable above current scope
         if (enclosing != null) {
             enclosing.Assign(name, value);
             return;

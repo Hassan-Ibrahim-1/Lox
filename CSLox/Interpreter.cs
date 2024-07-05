@@ -91,6 +91,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
                 if (left is string || right is string) {
                     return left.ToString() + right.ToString();
                 }
+                // TODO: Change this error message
                 throw new RuntimeError(expr.op, "Operands must be two numbers or two strings");
             case TokenType.Slash:
                 CheckNumberOperands(expr.op, left, right);
@@ -122,13 +123,13 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     }
 
     private static bool IsTrue(object obj) {
-        if (obj == null) return false;
+        if (obj is Nil) return false;
         if (obj is bool) return (bool)obj;
         return true;
     }
     
     private static string Stringify(object obj) {
-        if (obj == null) return "nil";
+        if (obj is Nil) return "nil";
 
         if (obj is double) {
             string text = obj.ToString()!;
