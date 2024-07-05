@@ -6,7 +6,6 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     private Environment environment = new Environment();
 
    public void Interpret(List<Stmt> stmts) {
-
         try {
             foreach (Stmt stmt in stmts) {
                 Execute(stmt);

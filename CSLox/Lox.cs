@@ -21,7 +21,7 @@ public class Lox {
     private static void RunFile(string path) {
         try {
             StreamReader sr = new StreamReader(Path.GetFullPath(path));
-            Run(sr.ReadToEnd());
+            Run(sr.ReadToEnd(), false);
         }
         catch (FileNotFoundException) {
             Console.WriteLine($"{path} not found!");
@@ -38,15 +38,15 @@ public class Lox {
             if (line == null) {
                 break;
             }
-            Run(line);
+            Run(line, true);
             hadError = false;
         }
     }
 
-    private static void Run(string source) {
+    private static void Run(string source, bool repl) {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.ScanTokens();
-        Parser parser = new Parser(tokens);
+        Parser parser = new Parser(tokens, repl);
         List<Stmt> statements = parser.Parse();
 
         if (hadError) return;

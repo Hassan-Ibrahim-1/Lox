@@ -5,10 +5,12 @@ public class Parser {
 
     private readonly List<Token> _tokens;
     private int _current = 0;
+    private bool repl;
     
 
-    public Parser(List<Token> tokens) {
+    public Parser(List<Token> tokens, bool repl) {
         this._tokens = tokens;
+        this.repl = repl;
     }
 
     public List<Stmt> Parse() {
@@ -67,7 +69,15 @@ public class Parser {
 
     private Stmt ExpressionStatement() {
          Expr expr = Expression();
-         Consume(TokenType.SemiColon, "Expect ';' after expression");
+         // Allow expression only statements in the repl
+         if (!repl) {
+             Consume(TokenType.SemiColon, "Expect ';' after expression");
+         }
+         else {
+             if (!Match(TokenType.SemiColon)) {
+                 return new Print(expr);
+             }
+         }
          return new Expression(expr);
     }
 
