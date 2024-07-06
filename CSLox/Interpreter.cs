@@ -37,6 +37,17 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         return null!;
     }
 
+    public object VisitIfStmt(If stmt) {
+        if (IsTrue(Evaluate(stmt.condition))) {
+            Execute(stmt.thenBranch);
+        }
+        else if (stmt.elseBranch != null) {
+            Execute(stmt.elseBranch);
+        }
+
+        return null!;
+    }
+
     public object VisitBlockStmt(Block stmt) {
         ExecuteBlock(stmt.statements, new Environment(environment));
         return null!;

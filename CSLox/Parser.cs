@@ -46,9 +46,26 @@ public class Parser {
     }
 
     private Stmt Statement() {
+        if (Match(TokenType.If)) return IfStatement();
         if (Match(TokenType.Print)) return PrintStatement();
         if (Match(TokenType.Left_Brace)) return new Block(Block());
         return ExpressionStatement();
+    }
+
+    private Stmt IfStatement() {
+        Consume(TokenType.Left_Paren, "Expect '(' after if");
+        Expr condition = Expression();
+        Consume(TokenType.Right_Paren, "Expect ')' after if condition");
+        // Not Declaration because you can't declare in an if statement
+        // Can declare in the block though
+        Stmt thenBranch = Statement();
+        Stmt elseBranch = null!;
+
+        if (Match(TokenType.Else)) {
+            elseBranch = Statement();
+        }
+
+        return new If(condition, thenBranch, elseBranch);
     }
 
     private List<Stmt> Block() {

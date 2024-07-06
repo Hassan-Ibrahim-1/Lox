@@ -19,7 +19,8 @@ public class GenerateAST {
                 "Expression : Expr expression",
                 "Block : List<Stmt> statements",
                 "Print : Expr expression",
-                "Var : Token name, Expr initializer"
+                "Var : Token name, Expr initializer",
+                "If : Expr condition, Stmt thenBranch, Stmt elseBranch"
             });
     }
 
@@ -34,7 +35,7 @@ public class GenerateAST {
 
         writer.WriteLine($"public abstract class {baseName} {{"); 
 
-        writer.WriteLine("    public abstract R accept<R>(IVisitor<R> visitor);");
+        writer.WriteLine("    public abstract R Accept<R>(IVisitor<R> visitor);");
 
         writer.WriteLine('}');
 
@@ -79,7 +80,7 @@ public class GenerateAST {
         }
         writer.WriteLine("    }");
 
-        writer.WriteLine("    public override R accept<R>(IVisitor<R> visitor) {");
+        writer.WriteLine("    public override R Accept<R>(IVisitor<R> visitor) {");
         writer.WriteLine($"        return visitor.Visit{className}{baseName}(this);");
         writer.WriteLine("    }");
 

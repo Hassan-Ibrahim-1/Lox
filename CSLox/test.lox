@@ -1,13 +1,5 @@
-print "Hello World!";
-
-var a = "global a";
-
-{
-    var a = "local a";
-    print a;
-    {
-        var a = "inner a";
-        print a;
-    }
+var x = 2;
+if (x = 1) {
+    print "works";
 }
-print a;
+else print "else works";
