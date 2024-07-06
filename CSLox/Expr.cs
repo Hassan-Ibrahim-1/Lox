@@ -7,6 +7,7 @@ public interface IVisitor<R> {
     R VisitUnaryExpr(Unary expr);
     R VisitVariableExpr(Variable expr);
     R VisitAssignmentExpr(Assignment expr);
+    R VisitLogicExpr(Logic expr);
 }
 
 public abstract class Expr {
@@ -79,5 +80,19 @@ public class Assignment : Expr {
     }
     public override R Accept<R>(IVisitor<R> visitor) {
         return visitor.VisitAssignmentExpr(this);
+    }
+}
+public class Logic : Expr {
+    public readonly Expr left;
+    public readonly Token op;
+    public readonly Expr right;
+
+    public Logic(Expr left, Token op, Expr right) {
+        this.left = left;
+        this.op = op;
+        this.right = right;
+    }
+    public override R Accept<R>(IVisitor<R> visitor) {
+        return visitor.VisitLogicExpr(this);
     }
 }

@@ -106,7 +106,7 @@ public class Parser {
         Expr expr = Ternary(); // variable name if an assignment expression
 
         // Not using a while loop becaues assignment is right associative
-        if (Match((TokenType.Equal))) {
+        if (Match(TokenType.Equal)) {
             Token equals = Previous(); // For error handling
 
             // The right side could be a non assignment expression or an assignment expression
@@ -121,7 +121,7 @@ public class Parser {
     }
 
     private Expr Ternary() {
-        Expr expr = Equality();
+        Expr expr = Or();
         while(Match(TokenType.Ternary_Question)) {
             Token ternaryOper = Previous();
             // Maybe call ternary instead
@@ -134,6 +134,26 @@ public class Parser {
             expr = new Binary(new Grouping(expr), ternaryOper, right);
         }
 
+        return expr;
+    }
+
+    private Expr Or() {
+        Expr expr = And();
+        while (Match(TokenType.Or)) {
+            Token op = Previous();
+            Expr right = And();
+            return new Logic(expr, op, right);
+        }
+        return expr;
+    }
+
+    private Expr And() {
+        Expr expr = Equality();
+        while (Match(TokenType.And)) {
+            Token op = Previous();
+            Expr right = Equality();
+            return new Logic(expr, op, right);
+        }
         return expr;
     }
 
@@ -184,6 +204,7 @@ public class Parser {
     }
 
     private Expr UnaryExpr() {
+        // Right associative
         if (Match(TokenType.Bang, TokenType.Minus)) {
             Token oper = Previous();
             Expr right = Expression();

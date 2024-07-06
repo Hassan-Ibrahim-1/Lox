@@ -2,11 +2,11 @@ using System.Text;
 
 namespace Lox;
 
-public class AstPrinter : IVisitor<string> {
+public class AstPrinter {
 
     public string Print(Expr expr) {
         // expr can be any child
-        return expr.Accept(this);
+        return "test";
     }
 
     public string VisitVariableExpr(Variable expr) {
@@ -41,7 +41,6 @@ public class AstPrinter : IVisitor<string> {
         
         foreach (Expr expr in exprs) {
             builder.Append(" ");
-            builder.Append(expr.Accept(this));
         }
         builder.Append(")");
         return builder.ToString();

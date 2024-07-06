@@ -59,6 +59,18 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         return value;
     }
 
+    // Doesn't return true or false
+    public object VisitLogicExpr(Logic expr) {
+        object left = Evaluate(expr.left);
+
+        if (expr.op.type == TokenType.Or) {
+            if (IsTrue(left)) return left;
+        }
+        else if (!IsTrue(left)) return left;
+        
+        return Evaluate(expr.right);
+    }
+
     // Using the variable in an expression
     public object VisitVariableExpr(Variable expr) {
         // Replace the name with the actual value
