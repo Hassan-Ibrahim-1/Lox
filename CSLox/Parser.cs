@@ -50,6 +50,7 @@ public class Parser {
         if (Match(TokenType.Print)) return PrintStatement();
         if (Match(TokenType.Left_Brace)) return new Block(Block());
         if (Match(TokenType.While)) return WhileStatement();
+        if (Match(TokenType.For)) return ForStatement();
         return ExpressionStatement();
     }
 
@@ -86,6 +87,65 @@ public class Parser {
         Stmt body = Statement();
 
         return new While(condition, body);
+    }
+
+    private Stmt ForStatement() {
+        // Constructed by desugaring
+        // Doesn't have its own syntax node
+        Consume(TokenType.Left_Paren, "Expect '(' after for statement.");
+
+        // Not an expression because it can be a variable declaration
+        Stmt initializer;
+
+        if (Match(TokenType.SemiColon)) {
+            initializer = null!;
+        }
+        else if (Match(TokenType.Var)) {
+            initializer = VarDeclaration();
+        }
+        else {
+            initializer = ExpressionStatement();
+        }
+
+        Expr condition = null!;
+
+        if (!Check(TokenType.SemiColon)) {
+            condition = Expression();
+        }
+        Consume(TokenType.SemiColon, "Expect ';' after loop condition.");
+
+        Expr increment = null!;
+
+        if (!Check(TokenType.Right_Paren)) {
+            increment = Expression();
+        }
+        Consume(TokenType.Right_Paren, "Expect ')' after for clauses.");
+        
+        Stmt body = Statement();
+
+        // Converting the for loop to a while loop
+        if (increment != null) {
+            var stmts = new List<Stmt>() {
+                body,
+                new Expression(increment)
+            };
+            body = new Block(stmts);
+        }
+
+        if (condition == null) {
+            condition = new Literal(true);
+        }
+        body = new While(condition, body);
+
+        if (initializer != null) {
+            var stmts = new List<Stmt>() {
+                initializer,
+                body
+            };
+            body = new Block(stmts);
+        }
+
+        return body;
     }
 
     private Stmt PrintStatement() {
