@@ -48,6 +48,13 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         return null!;
     }
 
+    public object VisitWhileStmt(While stmt) {
+        while (IsTrue(Evaluate(stmt.condition))) {
+            Execute(stmt.body);
+        }
+        return null!;
+    }
+
     public object VisitBlockStmt(Block stmt) {
         ExecuteBlock(stmt.statements, new Environment(environment));
         return null!;

@@ -49,6 +49,7 @@ public class Parser {
         if (Match(TokenType.If)) return IfStatement();
         if (Match(TokenType.Print)) return PrintStatement();
         if (Match(TokenType.Left_Brace)) return new Block(Block());
+        if (Match(TokenType.While)) return WhileStatement();
         return ExpressionStatement();
     }
 
@@ -76,6 +77,15 @@ public class Parser {
         }
         Consume(TokenType.Right_Brace, "Expect '}' after block.");
         return statements;
+    }
+
+    private Stmt WhileStatement() {
+        Consume(TokenType.Left_Paren, "Expect '(' after 'while'.");
+        Expr condition = Expression();
+        Consume(TokenType.Right_Paren, "Expect ')' after while condition");
+        Stmt body = Statement();
+
+        return new While(condition, body);
     }
 
     private Stmt PrintStatement() {
