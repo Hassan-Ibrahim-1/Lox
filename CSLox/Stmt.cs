@@ -7,6 +7,7 @@ public interface IStmtVisitor<R> {
     R VisitVarStmt(Var stmt);
     R VisitIfStmt(If stmt);
     R VisitWhileStmt(While stmt);
+    R VisitBreakStmt(Break stmt);
 }
 
 public abstract class Stmt {
@@ -79,5 +80,10 @@ public class While : Stmt {
     }
     public override R Accept<R>(IStmtVisitor<R> visitor) {
         return visitor.VisitWhileStmt(this);
+    }
+}
+public class Break : Stmt {
+    public override R Accept<R>(IStmtVisitor<R> visitor) {
+        return visitor.VisitBreakStmt(this);
     }
 }

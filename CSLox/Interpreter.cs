@@ -50,9 +50,18 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
 
     public object VisitWhileStmt(While stmt) {
         while (IsTrue(Evaluate(stmt.condition))) {
-            Execute(stmt.body);
+            try {
+                Execute(stmt.body);
+            }
+            catch (BreakStmt) {
+                break;
+            }
         }
         return null!;
+    }
+
+    public object VisitBreakStmt(Break stmt) {
+        throw new BreakStmt();
     }
 
     public object VisitBlockStmt(Block stmt) {

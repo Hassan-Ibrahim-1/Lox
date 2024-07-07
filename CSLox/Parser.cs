@@ -6,8 +6,9 @@ public class Parser {
     private readonly List<Token> _tokens;
     private int _current = 0;
     private bool repl;
-    
 
+    private int _loopNestLevel = 0;
+        
     public Parser(List<Token> tokens, bool repl) {
         this._tokens = tokens;
         this.repl = repl;
@@ -15,7 +16,6 @@ public class Parser {
 
     public List<Stmt> Parse() {
         List<Stmt> statements = new List<Stmt>();
-
         while (!IsAtEnd()) {
             statements.Add(Declaration());
         }
@@ -51,7 +51,14 @@ public class Parser {
         if (Match(TokenType.Left_Brace)) return new Block(Block());
         if (Match(TokenType.While)) return WhileStatement();
         if (Match(TokenType.For)) return ForStatement();
+        if (Match(TokenType.Break)) return BreakStatement();
         return ExpressionStatement();
+    }
+
+    private Stmt BreakStatement() {
+        if (_loopNestLevel == 0) Error(Previous(), "Break statement cannot be outside a loop.");
+        Consume(TokenType.SemiColon, "Expect ';' after break");
+        return new Break();
     }
 
     private Stmt IfStatement() {
@@ -84,8 +91,9 @@ public class Parser {
         Consume(TokenType.Left_Paren, "Expect '(' after 'while'.");
         Expr condition = Expression();
         Consume(TokenType.Right_Paren, "Expect ')' after while condition");
+        _loopNestLevel++;
         Stmt body = Statement();
-
+        _loopNestLevel--;
         return new While(condition, body);
     }
 
@@ -120,7 +128,7 @@ public class Parser {
             increment = Expression();
         }
         Consume(TokenType.Right_Paren, "Expect ')' after for clauses.");
-        
+        _loopNestLevel++;
         Stmt body = Statement();
 
         // Converting the for loop to a while loop
@@ -144,7 +152,7 @@ public class Parser {
             };
             body = new Block(stmts);
         }
-
+        _loopNestLevel--;
         return body;
     }
 
