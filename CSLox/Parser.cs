@@ -9,17 +9,6 @@ public class Parser {
 
     private int _loopNestLevel = 0;
 
-    private readonly TokenType[] _stmtTypes = {
-        TokenType.Class,
-        TokenType.For,
-        TokenType.Fun,
-        TokenType.If,
-        TokenType.Print,
-        TokenType.Var,
-        TokenType.Return,
-        TokenType.While
-    };
-        
     public Parser(List<Token> tokens, bool _repl) {
         this._tokens = tokens;
         this._repl = _repl;
@@ -358,22 +347,6 @@ public class Parser {
         throw Error(Peek(), message);
     }
 
-    private bool FindTokenInStmt(TokenType type) {
-        int index = _current;
-
-        while (!IsAtEnd()) {
-            Token token = PeekIndex(index);
-            if (_stmtTypes.Contains(token.type) || token.type == TokenType.SemiColon) {
-                break;
-            }
-            else if (token.type == type) {
-                return true;
-            }
-            index++;
-        }
-        return false;
-    }
-
     private bool Check(TokenType type) {
         if (IsAtEnd()) return false;
         return Peek().type == type;
@@ -412,9 +385,12 @@ public class Parser {
 
         while (!IsAtEnd()) {
             if (Previous().type == TokenType.SemiColon) return;
-
-            if (_stmtTypes.Contains(Peek().type)) {
-                return;
+            
+            switch(Peek().type) {
+                case TokenType.Class: case TokenType.For: case TokenType.Fun:
+                case TokenType.If: case TokenType.Print: case TokenType.Var:
+                case TokenType.Return: case TokenType.While:
+                    return;
             }
             Next();
         }
