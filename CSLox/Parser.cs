@@ -52,7 +52,6 @@ public class Parser {
         if (Match(TokenType.While)) return WhileStatement();
         if (Match(TokenType.For)) return ForStatement();
         if (Match(TokenType.Break)) return BreakStatement();
-        if (Match(TokenType.Continue)) return ContinueStatement();
         return ExpressionStatement();
     }
 
@@ -62,14 +61,6 @@ public class Parser {
         }
         Consume(TokenType.SemiColon, "Expect ';' after break");
         return new Break();
-    }
-
-    private Stmt ContinueStatement() {
-        if (_loopNestLevel == 0) { 
-            Error(Previous(), "'continue' cannot be outside a loop.");
-        }
-        Consume(TokenType.SemiColon, "Expect ';' after continue statement.");
-        return new Continue(); 
     }
 
     private Stmt IfStatement() {

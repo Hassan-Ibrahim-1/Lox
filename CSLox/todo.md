@@ -6,6 +6,3 @@
 2. Create a new comma Expr class.
     - Expr left
     - Expr right
-
-3. Fix break statements for 'for' loops.
-    - Continue makes the forloop skip the increment
