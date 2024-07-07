@@ -8,23 +8,24 @@ public class Scanner {
     private int _line = 1; // Used to figure out the exact location of the token
 
     private static readonly Dictionary<string, TokenType> _keywords = new Dictionary<string, TokenType>() {
-        { "and",    TokenType.And },
-        { "or",     TokenType.Or },
-        { "if",     TokenType.If },
-        { "else",   TokenType.Else },
-        { "true",   TokenType.True },
-        { "false",  TokenType.False },
-        { "class",  TokenType.Class },
-        { "fun",    TokenType.Fun },
-        { "for",    TokenType.For },
-        { "nil",    TokenType.Nil },
-        { "print",  TokenType.Print },
-        { "return", TokenType.Return },
-        { "super",  TokenType.Super },
-        { "this",   TokenType.This },
-        { "var",    TokenType.Var },
-        { "while",  TokenType.While },
-        { "break",  TokenType.Break},
+        { "and",       TokenType.And },
+        { "or",        TokenType.Or },
+        { "if",        TokenType.If },
+        { "else",      TokenType.Else },
+        { "true",      TokenType.True },
+        { "false",     TokenType.False },
+        { "class",     TokenType.Class },
+        { "fun",       TokenType.Fun },
+        { "for",       TokenType.For },
+        { "nil",       TokenType.Nil },
+        { "print",     TokenType.Print },
+        { "return",    TokenType.Return },
+        { "super",     TokenType.Super },
+        { "this",      TokenType.This },
+        { "var",       TokenType.Var },
+        { "while",     TokenType.While },
+        { "break",     TokenType.Break},
+        { "continue",  TokenType.Continue},
     };
 
     public Scanner (string source) {
@@ -164,11 +165,9 @@ public class Scanner {
 
         while (!IsAtEnd() && nestLevel > 0) {
             if (Peek() == '\n') {
-                Console.Write("new line");
                 _line++;
             }
             else if (Peek() == '/' && MatchNext('*')) {
-                Console.Write(Next());
                 nestLevel++;
             }
             else if (Peek() == '*' && MatchNext('/')) {
@@ -177,7 +176,7 @@ public class Scanner {
             }
             Next();
         }
-        if (IsAtEnd()) {
+        if (IsAtEnd() && nestLevel > 0) {
             Lox.Error(_line, "Multiline comment not closed.");
         }
     }

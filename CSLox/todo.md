@@ -7,9 +7,5 @@
     - Expr left
     - Expr right
 
-3. Add break and continue statements.
-    - only effect closest loop
-    - works inside of if statements
-    - finds closest loop
-    - don't execute any code in the loop after either break or continue
-    - don't hack around with blocks - refer to the actual loop  (while (true) if (true) break)
+3. Fix break statements for 'for' loops.
+    - Continue makes the forloop skip the increment

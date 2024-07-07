@@ -23,7 +23,8 @@ public class GenerateAST {
                 "Var : Token name, Expr initializer",
                 "If : Expr condition, Stmt thenBranch, Stmt elseBranch",
                 "While : Expr condition, Stmt body",
-                "Break : Stmt loop",
+                "Break : Null null",
+                "Continue : Null null",
             });
     }
 

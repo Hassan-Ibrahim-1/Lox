@@ -52,13 +52,24 @@ public class Parser {
         if (Match(TokenType.While)) return WhileStatement();
         if (Match(TokenType.For)) return ForStatement();
         if (Match(TokenType.Break)) return BreakStatement();
+        if (Match(TokenType.Continue)) return ContinueStatement();
         return ExpressionStatement();
     }
 
     private Stmt BreakStatement() {
-        if (_loopNestLevel == 0) Error(Previous(), "Break statement cannot be outside a loop.");
+        if (_loopNestLevel == 0) {
+            Error(Previous(), "'break' cannot be outside a loop.");
+        }
         Consume(TokenType.SemiColon, "Expect ';' after break");
         return new Break();
+    }
+
+    private Stmt ContinueStatement() {
+        if (_loopNestLevel == 0) { 
+            Error(Previous(), "'continue' cannot be outside a loop.");
+        }
+        Consume(TokenType.SemiColon, "Expect ';' after continue statement.");
+        return new Continue(); 
     }
 
     private Stmt IfStatement() {
@@ -91,10 +102,14 @@ public class Parser {
         Consume(TokenType.Left_Paren, "Expect '(' after 'while'.");
         Expr condition = Expression();
         Consume(TokenType.Right_Paren, "Expect ')' after while condition");
-        _loopNestLevel++;
-        Stmt body = Statement();
-        _loopNestLevel--;
-        return new While(condition, body);
+        try {
+            _loopNestLevel++;
+            Stmt body = Statement();
+            return new While(condition, body);
+        }
+        finally {
+            _loopNestLevel--;
+        }
     }
 
     private Stmt ForStatement() {
@@ -128,32 +143,36 @@ public class Parser {
             increment = Expression();
         }
         Consume(TokenType.Right_Paren, "Expect ')' after for clauses.");
-        _loopNestLevel++;
-        Stmt body = Statement();
+        try {
+            _loopNestLevel++;
+            Stmt body = Statement();
 
-        // Converting the for loop to a while loop
-        if (increment != null) {
-            var stmts = new List<Stmt>() {
-                body,
-                new Expression(increment)
-            };
-            body = new Block(stmts);
-        }
+            // Converting the for loop to a while loop
+            if (increment != null) {
+                var stmts = new List<Stmt>() {
+                    body,
+                        new Expression(increment)
+                };
+                body = new Block(stmts);
+            }
 
-        if (condition == null) {
-            condition = new Literal(true);
-        }
-        body = new While(condition, body);
+            if (condition == null) {
+                condition = new Literal(true);
+            }
+            body = new While(condition, body);
 
-        if (initializer != null) {
-            var stmts = new List<Stmt>() {
-                initializer,
-                body
-            };
-            body = new Block(stmts);
+            if (initializer != null) {
+                var stmts = new List<Stmt>() {
+                    initializer,
+                        body
+                };
+                body = new Block(stmts);
+            }
+            return body;
         }
-        _loopNestLevel--;
-        return body;
+        finally {
+            _loopNestLevel--;
+        }
     }
 
     private Stmt PrintStatement() {

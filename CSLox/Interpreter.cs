@@ -56,12 +56,19 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
             catch (BreakStmt) {
                 break;
             }
+            catch (ContinueStmt) {
+                continue;
+            }
         }
         return null!;
     }
 
     public object VisitBreakStmt(Break stmt) {
         throw new BreakStmt();
+    }
+
+    public object VisitContinueStmt(Continue stmt) {
+        throw new ContinueStmt();
     }
 
     public object VisitBlockStmt(Block stmt) {
