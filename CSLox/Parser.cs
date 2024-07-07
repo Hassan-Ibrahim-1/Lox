@@ -220,14 +220,13 @@ public class Parser {
     }
 
     private Expr Ternary() {
-        if (Previous().type == TokenType.Bang ||
-            Previous().type == TokenType.Minus) {
+        if (_current > 0 && (Previous().type == TokenType.Bang ||
+            Previous().type == TokenType.Minus)) {
             return Or();
         }
         Expr expr = Or();
 
         if (Match(TokenType.Ternary_Question)) {
-            Console.WriteLine(expr.GetType());
             Expr thenBranch = Ternary();
             Consume(TokenType.Ternary_Colon, "Expect ':' after then branch.");
             Expr elseBranch = Ternary();
@@ -308,7 +307,6 @@ public class Parser {
         if (Match(TokenType.Bang, TokenType.Minus)) {
             Token oper = Previous();
             Expr right = Expression();
-            Console.WriteLine(right.GetType());
             return new Unary(oper, right);
         }
         return Primary();
@@ -402,7 +400,6 @@ public class Parser {
     private Token Previous() {
         return _tokens[_current - 1];
     }
-
 
     private ParseError Error(Token token, string message) {
         Lox.Error(token, message);
