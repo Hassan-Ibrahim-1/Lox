@@ -75,6 +75,13 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         return value;
     }
 
+    public object VisitTernaryExpr(Ternary expr) {
+        if (IsTrue(Evaluate(expr.conditional))) {
+            return Evaluate(expr.thenBranch);
+        }
+        return Evaluate(expr.elseBranch);
+    }
+
     // Doesn't return true or false
     public object VisitLogicExpr(Logic expr) {
         object left = Evaluate(expr.left);

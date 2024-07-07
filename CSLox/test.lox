@@ -8,14 +8,16 @@
     print b;
     print "doesn't work";
     }
-*/
-
-var i = 0;
-while (i < 10) {
+    var i = 0;
+    while (i < 10) {
     print "i: " + i;
     for (var x = 0; x < 5; x = x + 1) {
-        print "x: " + x;
+    print "x: " + x;
     }
     i = i + 1;
-}
-
+    }
+*/
+// Should see 3
+var y = false;
+var x = !(y) ? 2 : 3;
+print x;

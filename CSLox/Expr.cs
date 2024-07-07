@@ -8,6 +8,7 @@ public interface IVisitor<R> {
     R VisitVariableExpr(Variable expr);
     R VisitAssignmentExpr(Assignment expr);
     R VisitLogicExpr(Logic expr);
+    R VisitTernaryExpr(Ternary expr);
 }
 
 public abstract class Expr {
@@ -94,5 +95,19 @@ public class Logic : Expr {
     }
     public override R Accept<R>(IVisitor<R> visitor) {
         return visitor.VisitLogicExpr(this);
+    }
+}
+public class Ternary : Expr {
+    public readonly Expr conditional;
+    public readonly Expr thenBranch;
+    public readonly Expr elseBranch;
+
+    public Ternary(Expr conditional, Expr thenBranch, Expr elseBranch) {
+        this.conditional = conditional;
+        this.thenBranch = thenBranch;
+        this.elseBranch = elseBranch;
+    }
+    public override R Accept<R>(IVisitor<R> visitor) {
+        return visitor.VisitTernaryExpr(this);
     }
 }

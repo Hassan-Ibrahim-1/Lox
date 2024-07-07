@@ -5,13 +5,24 @@ public class Parser {
 
     private readonly List<Token> _tokens;
     private int _current = 0;
-    private bool repl;
+    private readonly bool _repl;
 
     private int _loopNestLevel = 0;
+
+    private readonly TokenType[] _stmtTypes = {
+        TokenType.Class,
+        TokenType.For,
+        TokenType.Fun,
+        TokenType.If,
+        TokenType.Print,
+        TokenType.Var,
+        TokenType.Return,
+        TokenType.While
+    };
         
-    public Parser(List<Token> tokens, bool repl) {
+    public Parser(List<Token> tokens, bool _repl) {
         this._tokens = tokens;
-        this.repl = repl;
+        this._repl = _repl;
     }
 
     public List<Stmt> Parse() {
@@ -175,7 +186,7 @@ public class Parser {
     private Stmt ExpressionStatement() {
          Expr expr = Expression();
          // Allow expression only statements in the repl
-         if (!repl) {
+         if (!_repl) {
              Consume(TokenType.SemiColon, "Expect ';' after expression");
          }
          else {
@@ -209,18 +220,19 @@ public class Parser {
     }
 
     private Expr Ternary() {
-        Expr expr = Or();
-        while(Match(TokenType.Ternary_Question)) {
-            Token ternaryOper = Previous();
-            // Maybe call ternary instead
-            Expr trueChoice = Equality();
-            Consume(TokenType.Ternary_Colon, "Expect ':' after ternary conditional.");
-            Token ternaryColon = Previous();
-            Expr falseChoice = Equality();
-
-            Expr right = new Binary(trueChoice, ternaryColon, falseChoice);
-            expr = new Binary(new Grouping(expr), ternaryOper, right);
+        if (Previous().type == TokenType.Bang ||
+            Previous().type == TokenType.Minus) {
+            return Or();
         }
+        Expr expr = Or();
+
+        if (Match(TokenType.Ternary_Question)) {
+            Console.WriteLine(expr.GetType());
+            Expr thenBranch = Ternary();
+            Consume(TokenType.Ternary_Colon, "Expect ':' after then branch.");
+            Expr elseBranch = Ternary();
+            return new Ternary(expr, thenBranch, elseBranch);
+        }        
 
         return expr;
     }
@@ -296,6 +308,7 @@ public class Parser {
         if (Match(TokenType.Bang, TokenType.Minus)) {
             Token oper = Previous();
             Expr right = Expression();
+            Console.WriteLine(right.GetType());
             return new Unary(oper, right);
         }
         return Primary();
@@ -331,6 +344,7 @@ public class Parser {
         throw Error(Peek(), "Expect expression.");
     }
 
+
     private bool Match(params TokenType[] types) {
         foreach (TokenType type in types) {
             if (Check(type)) {
@@ -346,6 +360,21 @@ public class Parser {
         throw Error(Peek(), message);
     }
 
+    private bool FindTokenInStmt(TokenType type) {
+        int index = _current;
+
+        while (!IsAtEnd()) {
+            Token token = PeekIndex(index);
+            if (_stmtTypes.Contains(token.type) || token.type == TokenType.SemiColon) {
+                break;
+            }
+            else if (token.type == type) {
+                return true;
+            }
+            index++;
+        }
+        return false;
+    }
 
     private bool Check(TokenType type) {
         if (IsAtEnd()) return false;
@@ -354,6 +383,11 @@ public class Parser {
 
     private Token Peek() {
         return _tokens[_current];
+    }
+
+    private Token PeekIndex(int index) {
+        if (index >= _tokens.Count) return null!;
+        return _tokens[index];
     }
 
     private bool IsAtEnd() {
@@ -369,6 +403,7 @@ public class Parser {
         return _tokens[_current - 1];
     }
 
+
     private ParseError Error(Token token, string message) {
         Lox.Error(token, message);
         return new ParseError();
@@ -381,11 +416,8 @@ public class Parser {
         while (!IsAtEnd()) {
             if (Previous().type == TokenType.SemiColon) return;
 
-            switch(Peek().type) {
-                case TokenType.Class: case TokenType.For: case TokenType.Fun:
-                case TokenType.If: case TokenType.Print: case TokenType.Var:
-                case TokenType.Return: case TokenType.While:
-                    return;
+            if (_stmtTypes.Contains(Peek().type)) {
+                return;
             }
             Next();
         }
