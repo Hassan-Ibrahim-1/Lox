@@ -7,8 +7,3 @@
     - Expr left
     - Expr right
 
-3. Ternary Expr:
-    - called by assignment
-    - conditional - Expr
-    - then branch - Expr
-    - else branch - Expr

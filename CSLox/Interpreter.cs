@@ -3,7 +3,18 @@ namespace Lox;
 // IStmtVisitor here just returns null all the time
 public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     // current environment, not necessarily global
-    private Environment environment = new Environment();
+    private readonly Environment _globals = new Environment();
+    private Environment _environment;
+
+    public Interpreter() {
+        _environment = _globals;
+        
+        Token clockToken = new Token(TokenType.Identifier, "clock", null!, 0);
+        _globals.Define(clockToken, new Clock());
+
+        Token exitToken = new Token(TokenType.Identifier, "exit", null!, 0);
+        _globals.Define(exitToken, new Exit());
+    }
 
    public void Interpret(List<Stmt> stmts) {
         try {
@@ -33,7 +44,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         if (stmt.initializer != null) {
             value = Evaluate(stmt.initializer);
         }
-        environment.Define(stmt.name, value);
+        _environment.Define(stmt.name, value);
         return null!;
     }
 
@@ -65,13 +76,13 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     }
 
     public object VisitBlockStmt(Block stmt) {
-        ExecuteBlock(stmt.statements, new Environment(environment));
+        ExecuteBlock(stmt.statements, new Environment(_environment));
         return null!;
     }
 
     public object VisitAssignmentExpr(Assignment stmt) {
         object value = Evaluate(stmt.value);
-        environment.Assign(stmt.name, value);
+        _environment.Assign(stmt.name, value);
         return value;
     }
 
@@ -97,7 +108,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     // Using the variable in an expression
     public object VisitVariableExpr(Variable expr) {
         // Replace the name with the actual value
-        return environment.Get(expr.name);
+        return _environment.Get(expr.name);
     }
 
     public object VisitLiteralExpr(Literal expr) {
@@ -168,6 +179,27 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         return null!; // Unreachable
     }
 
+    public object VisitCallExpr(Call expr) {
+        object callee = Evaluate(expr.callee);
+        var arguments = new List<object>();
+        
+        foreach (Expr argument in expr.arguments) {
+            arguments.Add(Evaluate(argument));
+        }
+
+        if (!(callee is LoxCallable)) {
+            throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+        }
+
+        LoxCallable function = (LoxCallable)callee;
+
+        if (arguments.Count != function.Arity()) {
+            throw new RuntimeError(expr.paren, $"Expected {function.Arity()} arguments but got {arguments.Count}.");
+        }
+
+        return function.Call(this, arguments);
+    }
+
     private static bool IsTrue(object obj) {
         if (obj is Nil) return false;
         if (obj is bool) return (bool)obj;
@@ -214,18 +246,18 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     }
     
     private void ExecuteBlock(List<Stmt> statements, Environment environment) {
-        Environment previous = this.environment;
+        Environment previous = this._environment;
 
         try {
             // Change environment for every method so that variable declarations only exist in that environment
-            this.environment = environment;
+            this._environment = environment;
             
             foreach(Stmt stmt in statements) {
                 Execute(stmt);
             }
         }
         finally {
-            this.environment = previous; // Eventually gets set back to the global environment
+            this._environment = previous; // Eventually gets set back to the global environment
         }
     }
 }
