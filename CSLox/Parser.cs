@@ -26,6 +26,7 @@ public class Parser {
     private Stmt Declaration() {
         try {
             if (Match(TokenType.Var)) return VarDeclaration();
+            if (Match(TokenType.Fun)) return Function("function");
             return Statement();
         }
         catch (ParseError) {
@@ -45,6 +46,27 @@ public class Parser {
         return new Var(name, initializer);
     }
 
+    private Stmt Function(string kind) {
+        Token name = Consume(TokenType.Identifier, $"Expect {kind} name.");
+        Consume(TokenType.Left_Paren, $"Expect '(' after {kind} name");
+
+        var parameters = new List<Token>();
+        if (!Check(TokenType.Right_Paren)) {
+            do {
+                if (parameters.Count >= 255) {
+                    Error(Peek(), $"A {kind} cannot have more than 255 parameters");
+                }
+                parameters.Add(Consume(TokenType.Identifier, $"Expect parameter name"));
+            } while (Match(TokenType.Comma));
+        }
+
+        Consume(TokenType.Right_Paren, "Expect '(' after parameters");
+        Consume(TokenType.Left_Brace, $"Expect '{{' before {kind} body.");
+        List<Stmt> body = Block();
+
+        return new Function(name, parameters, body);
+    }
+
     private Stmt Statement() {
         if (Match(TokenType.If)) return IfStatement();
         if (Match(TokenType.Print)) return PrintStatement();
@@ -52,6 +74,7 @@ public class Parser {
         if (Match(TokenType.While)) return WhileStatement();
         if (Match(TokenType.For)) return ForStatement();
         if (Match(TokenType.Break)) return BreakStatement();
+        if (Match(TokenType.Return)) return ReturnStatement();
         return ExpressionStatement();
     }
 
@@ -184,6 +207,17 @@ public class Parser {
              }
          }
          return new Expression(expr);
+    }
+
+    private Stmt ReturnStatement() {
+        Token keyword = Previous();
+        Expr value = null!;
+
+        if (!Check(TokenType.SemiColon)) {
+            value = Expression();
+        }
+        Consume(TokenType.SemiColon, "Expect ';' after return statement");
+        return new Return(keyword, value);
     }
 
     private Expr Expression() {

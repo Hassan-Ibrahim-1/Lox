@@ -3,17 +3,17 @@ namespace Lox;
 // IStmtVisitor here just returns null all the time
 public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     // current environment, not necessarily global
-    private readonly Environment _globals = new Environment();
+    public readonly Environment globals = new Environment();
     private Environment _environment;
 
     public Interpreter() {
-        _environment = _globals;
+        _environment = globals;
         
         Token clockToken = new Token(TokenType.Identifier, "clock", null!, 0);
-        _globals.Define(clockToken, new Clock());
+        globals.Define(clockToken, new Clock());
 
         Token exitToken = new Token(TokenType.Identifier, "exit", null!, 0);
-        _globals.Define(exitToken, new Exit());
+        globals.Define(exitToken, new Exit());
     }
 
    public void Interpret(List<Stmt> stmts) {
@@ -78,6 +78,22 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     public object VisitBlockStmt(Block stmt) {
         ExecuteBlock(stmt.statements, new Environment(_environment));
         return null!;
+    }
+
+    public object VisitFunctionStmt(Function stmt) {
+        var function = new LoxFunction(stmt);
+        _environment.Define(stmt.name, function);
+        return null!;
+    }
+
+    public object VisitReturnStmt(Return stmt) {
+        object value = new Nil();
+
+        if (stmt.value != null) {
+            value = Evaluate(stmt.value);
+        }
+
+        throw new ReturnException(value);
     }
 
     public object VisitAssignmentExpr(Assignment stmt) {
@@ -245,7 +261,8 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         stmt.Accept(this);
     }
     
-    private void ExecuteBlock(List<Stmt> statements, Environment environment) {
+    // Environment represents the environment to switch to
+    public void ExecuteBlock(List<Stmt> statements, Environment environment) {
         Environment previous = this._environment;
 
         try {

@@ -1,23 +1,8 @@
-/*
-    for (var i = 0; i < 3; i = i + 1) {
-        print i;
-        continue;
-        print "doesn't work";
-    }
-    for (var b = 0; b < 10; b = 1 + b) {
-    print b;
-    print "doesn't work";
-    }
-    var i = 0;
-    while (i < 10) {
-    print "i: " + i;
-    for (var x = 0; x < 5; x = x + 1) {
-    print "x: " + x;
-    }
-    i = i + 1;
-    }
-*/
-// Should see 3
-var y = false;
-var x = !(y) ? 2 : 3;
-print x;
+fun fib(n) {
+    if (n <= 1) return n;
+    return fib(n - 2) + fib(n - 1);
+}
+
+for (var i = 0; i < 20; i = i + 1) {
+    print(fib(i));
+}

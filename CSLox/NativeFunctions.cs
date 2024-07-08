@@ -6,7 +6,7 @@ public class Clock : LoxCallable {
     }
 
     public object Call(Interpreter interpreter, List<object> arguments) {
-        return (double)System.Environment.TickCount;
+        return (double)DateTimeOffset.Now.ToUnixTimeSeconds();
     }
 
     public override string ToString() {

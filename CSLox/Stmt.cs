@@ -8,6 +8,8 @@ public interface IStmtVisitor<R> {
     R VisitIfStmt(If stmt);
     R VisitWhileStmt(While stmt);
     R VisitBreakStmt(Break stmt);
+    R VisitFunctionStmt(Function stmt);
+    R VisitReturnStmt(Return stmt);
 }
 
 public abstract class Stmt {
@@ -85,5 +87,31 @@ public class While : Stmt {
 public class Break : Stmt {
     public override R Accept<R>(IStmtVisitor<R> visitor) {
         return visitor.VisitBreakStmt(this);
+    }
+}
+public class Function : Stmt {
+    public readonly Token name;
+    public readonly List<Token> parameters;
+    public readonly List<Stmt> body;
+
+    public Function(Token name, List<Token> parameters, List<Stmt> body) {
+        this.name = name;
+        this.parameters= parameters;
+        this.body = body;
+    }
+    public override R Accept<R>(IStmtVisitor<R> visitor) {
+        return visitor.VisitFunctionStmt(this);
+    }
+}
+public class Return : Stmt {
+    public readonly Token keyword;
+    public readonly Expr value;
+
+    public Return(Token keyword, Expr value) {
+        this.keyword = keyword;
+        this.value = value;
+    }
+    public override R Accept<R>(IStmtVisitor<R> visitor) {
+        return visitor.VisitReturnStmt(this);
     }
 }
