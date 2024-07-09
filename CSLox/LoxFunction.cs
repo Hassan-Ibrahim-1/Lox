@@ -15,11 +15,11 @@ public class LoxFunction : LoxCallable {
         
         // Map arguments to parameters
         for (int i = 0; i < arguments.Count; i++) {
-            environment.Define(_declaration.parameters[i], arguments[i]);
+            environment.Define(_declaration.functionExpr.parameters[i], arguments[i]);
         }
 
         try {
-            interpreter.ExecuteBlock(_declaration.body, environment);
+            interpreter.ExecuteBlock(_declaration.functionExpr.body, environment);
         }
         catch (ReturnException e) {
             return e.value;
@@ -28,10 +28,10 @@ public class LoxFunction : LoxCallable {
     }
 
     public int Arity() {
-        return _declaration.parameters.Count;
+        return _declaration.functionExpr.parameters.Count;
     }
 
     public override string ToString() {
-        return $"<fn {_declaration.name}>";
+        return $"<fn {_declaration.name.lexeme}>";
     }
 }

@@ -17,7 +17,7 @@ public class GenerateAST {
                 "Logic : Expr left, Token op, Expr right",
                 "Ternary : Expr conditional, Expr thenBranch, Expr elseBranch",
                 "Call : Expr callee, Token paren, List<Expr> arguments",
-                "AnonymousFunction : List<Token> parameters, List<Stmt> body",
+                "FunctionExpr: List<Token> parameters, List<Stmt> body",
             });
         DefineAST(outputDir, "Stmt", new List<string>() {
                 "Expression : Expr expression",
@@ -27,7 +27,7 @@ public class GenerateAST {
                 "If : Expr condition, Stmt thenBranch, Stmt elseBranch",
                 "While : Expr condition, Stmt body",
                 "Break : Null null",
-                "Function : Token name, List<Token> params, List<Stmt> body",
+                "Function : Token name, FunctionExpr functionExpr",
                 "Return : Token keyword, Expr value"
             });
     }

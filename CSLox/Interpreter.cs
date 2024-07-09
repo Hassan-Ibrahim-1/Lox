@@ -216,6 +216,12 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         return function.Call(this, arguments);
     }
 
+    public object VisitFunctionExpr(FunctionExpr expr) {
+        Token name = new Token(TokenType.Nil, null!, null!, 0);
+        Function function = new Function(name, expr);
+        return new LoxFunction(function, _environment);
+    }
+
     private static bool IsTrue(object obj) {
         if (obj is Nil) return false;
         if (obj is bool) return (bool)obj;

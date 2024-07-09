@@ -91,13 +91,11 @@ public class Break : Stmt {
 }
 public class Function : Stmt {
     public readonly Token name;
-    public readonly List<Token> parameters;
-    public readonly List<Stmt> body;
+    public readonly FunctionExpr functionExpr;
 
-    public Function(Token name, List<Token> parameters, List<Stmt> body) {
+    public Function(Token name, FunctionExpr functionExpr) {
         this.name = name;
-        this.parameters= parameters;
-        this.body = body;
+        this.functionExpr = functionExpr;
     }
     public override R Accept<R>(IStmtVisitor<R> visitor) {
         return visitor.VisitFunctionStmt(this);
