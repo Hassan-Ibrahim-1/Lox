@@ -26,7 +26,9 @@ public class Parser {
     private Stmt Declaration() {
         try {
             if (Match(TokenType.Var)) return VarDeclaration();
-            if (Match(TokenType.Fun)) return Function("function");
+            if (Match(TokenType.Fun)) {
+                return Function("function");
+            }
             return Statement();
         }
         catch (ParseError) {
@@ -195,6 +197,17 @@ public class Parser {
         return new Print(value);
     }
 
+    private Stmt ReturnStatement() {
+        Token keyword = Previous();
+        Expr value = null!;
+
+        if (!Check(TokenType.SemiColon)) {
+            value = Expression();
+        }
+        Consume(TokenType.SemiColon, "Expect ';' after return statement");
+        return new Return(keyword, value);
+    }
+
     private Stmt ExpressionStatement() {
          Expr expr = Expression();
          // Allow expression only statements in the repl
@@ -209,19 +222,32 @@ public class Parser {
          return new Expression(expr);
     }
 
-    private Stmt ReturnStatement() {
-        Token keyword = Previous();
-        Expr value = null!;
-
-        if (!Check(TokenType.SemiColon)) {
-            value = Expression();
-        }
-        Consume(TokenType.SemiColon, "Expect ';' after return statement");
-        return new Return(keyword, value);
-    }
-
     private Expr Expression() {
         return Assignment();
+    }
+
+    private Expr AnonymousFunction() {
+        if (!Match(TokenType.Fun)) {
+            return Assignment();
+        }
+
+        Token paren = Consume(TokenType.Left_Paren, "Expect '(' after anonymous function declaration.");
+        
+        List<Token> parameters = new List<Token>();
+
+        if (!Check(TokenType.Right_Paren)) {
+            do {
+                if (parameters.Count >= 255) {
+                    Error(paren, "A function cannot have more than 255 parameters.");
+                }
+                parameters.Add(Consume(TokenType.Identifier, "Expect identifier as a parameter."));
+            } while(!Check(TokenType.Right_Paren));
+        }
+        Consume(TokenType.Right_Paren, "Expect ')' before function body.");
+
+        List<Stmt> body = Block();
+        
+        return new AnonymousFunction(parameters, body);
     }
 
     private Expr Assignment() {
@@ -420,11 +446,6 @@ public class Parser {
 
     private Token Peek() {
         return _tokens[_current];
-    }
-
-    private Token PeekIndex(int index) {
-        if (index >= _tokens.Count) return null!;
-        return _tokens[index];
     }
 
     private bool IsAtEnd() {

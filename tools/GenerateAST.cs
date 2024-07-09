@@ -17,6 +17,7 @@ public class GenerateAST {
                 "Logic : Expr left, Token op, Expr right",
                 "Ternary : Expr conditional, Expr thenBranch, Expr elseBranch",
                 "Call : Expr callee, Token paren, List<Expr> arguments",
+                "AnonymousFunction : List<Token> parameters, List<Stmt> body",
             });
         DefineAST(outputDir, "Stmt", new List<string>() {
                 "Expression : Expr expression",

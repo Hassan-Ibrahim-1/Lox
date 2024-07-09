@@ -2,15 +2,18 @@ namespace Lox;
 
 public class LoxFunction : LoxCallable {
     private readonly Function _declaration;
+    // Scope where the function is declared in
+    private readonly Environment _closure;
 
-    public LoxFunction(Function declaration) {
+    public LoxFunction(Function declaration, Environment closure) {
         this._declaration = declaration;
+        this._closure = closure;
     }
 
     public object Call(Interpreter interpreter, List<object> arguments) {
-        Environment environment = new Environment(interpreter.globals);
+        Environment environment = new Environment(_closure);
         
-        // Maps arguments to parameters
+        // Map arguments to parameters
         for (int i = 0; i < arguments.Count; i++) {
             environment.Define(_declaration.parameters[i], arguments[i]);
         }

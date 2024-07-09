@@ -10,6 +10,7 @@ public interface IVisitor<R> {
     R VisitLogicExpr(Logic expr);
     R VisitTernaryExpr(Ternary expr);
     R VisitCallExpr(Call expr);
+    R VisitAnonymousFunctionExpr(AnonymousFunction expr);
 }
 
 public abstract class Expr {
@@ -126,3 +127,16 @@ public class Call : Expr {
         return visitor.VisitCallExpr(this);
     }
 }
+public class AnonymousFunction : Expr {
+    public readonly List<Token> parameters;
+    public readonly List<Stmt> body;
+
+    public AnonymousFunction(List<Token> parameters, List<Stmt> body) {
+        this.parameters = parameters;
+        this.body = body;
+    }
+    public override R Accept<R>(IVisitor<R> visitor) {
+        return visitor.VisitAnonymousFunctionExpr(this);
+    }
+}
+

@@ -81,7 +81,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     }
 
     public object VisitFunctionStmt(Function stmt) {
-        var function = new LoxFunction(stmt);
+        var function = new LoxFunction(stmt, _environment);
         _environment.Define(stmt.name, function);
         return null!;
     }
