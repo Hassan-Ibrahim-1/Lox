@@ -1,6 +1,5 @@
 namespace Lox;
 
-
 public class Environment {
     private readonly Dictionary<string, object> values = new Dictionary<string, object>();
     public readonly Environment enclosing;
@@ -30,6 +29,21 @@ public class Environment {
         throw new RuntimeError(name, $"Undefined variable '{name.lexeme}'.");
     }
 
+    public object GetAt(Token name, int distance) {
+        return Ancestor(distance).values[name.lexeme];
+    }
+
+    private Environment Ancestor(int distance) {
+        // if distance is 0 then the variable is the in the current environment
+        Environment environment = this;
+
+        for (int i = 0; i < distance; i++) {
+            environment = environment.enclosing;
+        }
+
+        return environment;
+    }
+
     public void Assign(Token name, object value) {
         if (values.ContainsKey(name.lexeme)) {
             values[name.lexeme] = value;
@@ -43,5 +57,9 @@ public class Environment {
         }
 
         throw new RuntimeError(name, $"Undefined variable '{name.lexeme}'.");
+    }
+
+    public void AssignAt(Token name, object value, int distance) {
+        Ancestor(distance).values[name.lexeme] = value;
     }
 }

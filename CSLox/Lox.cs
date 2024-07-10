@@ -23,6 +23,7 @@ public class Lox {
             StreamReader sr = new StreamReader(Path.GetFullPath(path));
             Run(sr.ReadToEnd(), false);
         }
+
         catch (FileNotFoundException) {
             Console.WriteLine($"{path} not found!");
             hadError = true;
@@ -46,10 +47,17 @@ public class Lox {
     private static void Run(string source, bool repl) {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.ScanTokens();
+
         Parser parser = new Parser(tokens, repl);
         List<Stmt> statements = parser.Parse();
 
-        if (hadError) return;
+        if (hadError) return; // Syntax error
+        
+        Resolver resolver = new Resolver(interpreter);
+        resolver.Resolve(statements);
+
+        if (hadError) return; // Resolver error
+
         interpreter.Interpret(statements);
     } 
     
@@ -67,7 +75,7 @@ public class Lox {
     }
 
     public static void RuntimeError(RuntimeError e) {
-        Console.WriteLine($"{e.Message}\n[ line { e.token.line} ]");
+        Console.WriteLine($"[line { e.token.line}] {e.Message}");
         hadRuntimeError = true;
     }
 

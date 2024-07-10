@@ -3,17 +3,19 @@ namespace Lox;
 // IStmtVisitor here just returns null all the time
 public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     // current environment, not necessarily global
-    public readonly Environment globals = new Environment();
+    private readonly Environment _globals = new Environment();
     private Environment _environment;
 
+    private readonly Dictionary<Expr, int> _locals = new Dictionary<Expr, int>();
+
     public Interpreter() {
-        _environment = globals;
+        _environment = _globals;
         
         Token clockToken = new Token(TokenType.Identifier, "clock", null!, 0);
-        globals.Define(clockToken, new Clock());
+        _globals.Define(clockToken, new Clock());
 
         Token exitToken = new Token(TokenType.Identifier, "exit", null!, 0);
-        globals.Define(exitToken, new Exit());
+        _globals.Define(exitToken, new Exit());
     }
 
    public void Interpret(List<Stmt> stmts) {
@@ -96,9 +98,16 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         throw new ReturnException(value);
     }
 
-    public object VisitAssignmentExpr(Assignment stmt) {
-        object value = Evaluate(stmt.value);
-        _environment.Assign(stmt.name, value);
+    public object VisitAssignmentExpr(Assignment expr) {
+        object value = Evaluate(expr.value);
+        if (_locals.ContainsKey(expr)) {
+            _environment.AssignAt(expr.name, value, _locals[expr]);
+        }
+        // globals
+        else {
+            _environment.Assign(expr.name, value);
+        }
+
         return value;
     }
 
@@ -123,8 +132,17 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
 
     // Using the variable in an expression
     public object VisitVariableExpr(Variable expr) {
-        // Replace the name with the actual value
-        return _environment.Get(expr.name);
+        return LookUpVariable(expr.name, expr);
+    }
+
+    private object LookUpVariable(Token name, Variable expr) {
+        if (_locals.ContainsKey(expr)) {
+            return _environment.GetAt(name, _locals[expr]);
+        }
+        // global
+        else {
+            return _globals.Get(name);
+        }
     }
 
     public object VisitLiteralExpr(Literal expr) {
@@ -266,7 +284,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     private void Execute(Stmt stmt) {
         stmt.Accept(this);
     }
-    
+
     // Environment represents the environment to switch to
     public void ExecuteBlock(List<Stmt> statements, Environment environment) {
         Environment previous = this._environment;
@@ -282,5 +300,9 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         finally {
             this._environment = previous; // Eventually gets set back to the global environment
         }
+    }
+
+    public void Resolve(Expr expr, int depth) {
+        _locals.Add(expr, depth);
     }
 }

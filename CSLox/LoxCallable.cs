@@ -5,4 +5,3 @@ public interface LoxCallable {
     int Arity();
 }
 
-
