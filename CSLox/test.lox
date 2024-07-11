@@ -1,29 +1,9 @@
-/*var a = "global";
-{
-    fun showA() {
-        print a;    
+fun test() {
+    var a = "it works!";
+    fun func() {
+        var a = "please";
+        print a;
     }
-    showA();
-    var a = "block";
-    showA();
-    var a = "test";
-    fun test() {
-    var a = "first";
-    }
-    test();
-    print a;
-}*/
-
-fun fun1 (func) {
-    print func();
-    fun test() {
-       return "fun1";
-    }
-    print test();
-    return "final";
+    func();
 }
-
-print fun1(fun () {
-    return "anonymous";
-});
-return;
+test();

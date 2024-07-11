@@ -1,17 +1,6 @@
 namespace Lox;
 
 public class Resolver : IVisitor<object>, IStmtVisitor<object> {
-
-    private struct VarState {
-        public bool defined;
-        public bool used;
-
-        public VarState(bool defined, bool used) {
-            this.defined = defined;
-            this.used = used;
-        }
-    }
-
     private enum FunctionType {
         None,
         Function,
@@ -41,10 +30,10 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
     }
 
     private void ResolveFunction(FunctionExpr expr, FunctionType functionType) {
-        BeginScope();
         FunctionType enclosingFunction = _currentFunction;
         _currentFunction = functionType; 
 
+        BeginScope();
         foreach(Token param in expr.parameters) {
             Declare(param);
             Define(param);
@@ -60,7 +49,8 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
     private void ResolveLocal(Expr expr, Token name) {
         for (int i = scopes.Count - 1; i >= 0; i--) {
             if (scopes.ElementAt(i).ContainsKey(name.lexeme)) {
-                _interpreter.Resolve(expr, scopes.Count - i - 1);
+                CPrint.Print($"Resolving {name.lexeme} when there are {scopes.Count} scopes. depth: {scopes.Count - 1 - i} i: {i}", ConsoleColor.Cyan);
+                _interpreter.Resolve(expr, i);
             }
         } 
     }
@@ -151,6 +141,7 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
     public object VisitAssignmentExpr(Assignment expr) {
         Resolve(expr.value);
         ResolveLocal(expr, expr.name);
+        Console.WriteLine($"Resolving {expr.name} from Assignment expr");
         return null!;
     }
 
@@ -160,6 +151,7 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
                 Lox.Error(expr.name, "Can't read local variable in it's own initializer.");
             }
         }
+        Console.WriteLine($"Resolving {expr.name} from Variable expr");
         ResolveLocal(expr, expr.name);
         return null!;
     }
