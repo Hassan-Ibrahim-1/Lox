@@ -9,7 +9,6 @@ public class Environment {
     }
 
     public void Define(Token name, object value) {
-        CPrint.Print($"Defining {name.lexeme} with value {value}", ConsoleColor.Blue);
         if (values.ContainsKey(name.lexeme)) {
             throw new RuntimeError(name, $"Variable '{name.lexeme}' has already been defined");
         }
@@ -31,7 +30,6 @@ public class Environment {
     }
 
     public object GetAt(Token name, int distance) {
-        CPrint.Print($"Getting {name.lexeme} at distance {distance}", ConsoleColor.Red);
         return Ancestor(distance).values[name.lexeme];
     }
 

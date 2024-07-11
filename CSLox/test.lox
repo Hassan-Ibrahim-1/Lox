@@ -1,9 +1,9 @@
-fun test() {
-    var a = "it works!";
-    fun func() {
-        var a = "please";
-        print a;
+fun varTest() {
+    fun func(b) {
+        print b;
     }
-    func();
+    var a;
+    func(a);
 }
-test();
+
+varTest();

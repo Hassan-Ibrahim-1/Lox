@@ -6,9 +6,15 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
         Function,
     }
 
+    private enum VarState {
+        Declared,
+        Defined,
+        Used
+    }
+
     private readonly Interpreter _interpreter;
     // A stack of scopes
-    private readonly Stack<Dictionary<string, bool>> scopes = new Stack<Dictionary<string, bool>>();
+    private readonly Stack<Dictionary<string, VarState>> scopes = new Stack<Dictionary<string, VarState>>();
     private FunctionType _currentFunction = FunctionType.None;
 
     public Resolver(Interpreter interpreter) {
@@ -49,28 +55,34 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
     private void ResolveLocal(Expr expr, Token name) {
         for (int i = scopes.Count - 1; i >= 0; i--) {
             if (scopes.ElementAt(i).ContainsKey(name.lexeme)) {
-                CPrint.Print($"Resolving {name.lexeme} when there are {scopes.Count} scopes. depth: {scopes.Count - 1 - i} i: {i}", ConsoleColor.Cyan);
                 _interpreter.Resolve(expr, i);
+                scopes.ElementAt(i)[name.lexeme] = VarState.Used;
             }
         } 
     }
 
     private void BeginScope() {
-        scopes.Push(new Dictionary<string, bool>());
+        scopes.Push(new Dictionary<string, VarState>());
     }
 
     private void EndScope() {
+        Dictionary<string, VarState> scope = scopes.Peek();
+        foreach (string key in scope.Keys) {
+            if (scope[key] != VarState.Used) {
+                CPrint.Print($"Warning: Local variable '{key}' never used.", ConsoleColor.Yellow);
+            }
+        }
         scopes.Pop();
     }
 
     private void Declare(Token name) {
         if (scopes.Count == 0) return;
-        scopes.Peek()[name.lexeme] = false;
+        scopes.Peek()[name.lexeme] = VarState.Declared;
     }
 
     private void Define(Token name) {
         if (scopes.Count == 0) return;
-        scopes.Peek()[name.lexeme] = true;
+        scopes.Peek()[name.lexeme] = VarState.Defined;
     }
     
     public object VisitBlockStmt(Block stmt) {
@@ -141,17 +153,15 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
     public object VisitAssignmentExpr(Assignment expr) {
         Resolve(expr.value);
         ResolveLocal(expr, expr.name);
-        Console.WriteLine($"Resolving {expr.name} from Assignment expr");
         return null!;
     }
 
     public object VisitVariableExpr(Variable expr) {
         if (scopes.Count != 0 && scopes.Peek().ContainsKey(expr.name.lexeme)) {
-            if (!scopes.Peek()[expr.name.lexeme]) {
+            if (scopes.Peek()[expr.name.lexeme] != VarState.Defined) {
                 Lox.Error(expr.name, "Can't read local variable in it's own initializer.");
             }
         }
-        Console.WriteLine($"Resolving {expr.name} from Variable expr");
         ResolveLocal(expr, expr.name);
         return null!;
     }

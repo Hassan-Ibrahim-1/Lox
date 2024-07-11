@@ -218,7 +218,11 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         var arguments = new List<object>();
         
         foreach (Expr argument in expr.arguments) {
-            arguments.Add(Evaluate(argument));
+            object value = Evaluate(argument);
+            if (value == null) {
+                throw new RuntimeError(expr.paren, "An argument provided is not set to an instance of an object");
+            }
+            arguments.Add(value!);
         }
 
         if (!(callee is LoxCallable)) {
@@ -228,7 +232,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         LoxCallable function = (LoxCallable)callee;
 
         if (arguments.Count != function.Arity()) {
-            throw new RuntimeError(expr.paren, $"Expected {function.Arity()} arguments but got {arguments.Count}.");
+            throw new RuntimeError(expr.paren, $"Expected {function.Arity()} argument(s) but got {arguments.Count}.");
         }
 
         return function.Call(this, arguments);
