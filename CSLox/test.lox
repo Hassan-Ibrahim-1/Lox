@@ -1,7 +1,11 @@
 fun varTest() {
-    var a;
+    var a = "outer";
     fun func() {
-        var a = "it works!";
+        var a = "inner";
+        {
+            var a = "innermost";
+            print a;
+        }
         print a;
     }
     func();

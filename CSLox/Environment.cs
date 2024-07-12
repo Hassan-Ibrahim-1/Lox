@@ -1,7 +1,7 @@
 namespace Lox;
 
 public class Environment {
-    private readonly Dictionary<string, object> values = new Dictionary<string, object>();
+    private readonly List<object> _values = new List<object>(); 
     public readonly Environment enclosing;
 
     public Environment(Environment enclosing = null!) {
@@ -9,33 +9,11 @@ public class Environment {
     }
 
     public void Define(Token name, object value) {
-        if (values.ContainsKey(name.lexeme)) {
-            throw new RuntimeError(name, $"Variable '{name.lexeme}' has already been defined");
-        }
-        values.Add(name.lexeme, value);
+        _values.Add(value);
     }
 
-    public object Get(Token name) {
-        if (values.ContainsKey(name.lexeme)) {
-            if (values[name.lexeme] != null) {
-                return values[name.lexeme];
-            }
-            throw new RuntimeError(name, $"Variable '{name.lexeme}' has not been assigned to any value.");
-        }
-        
-        // When it reaches global scope and the variable isn't found the runtime error is thrown
-        if (enclosing != null) return enclosing.Get(name);
-
-        throw new RuntimeError(name, $"Undefined variable '{name.lexeme}'.");
-    }
-
-    public object GetAt(Token name, int? distance) {
-        object value = Ancestor(distance).values[name.lexeme];
-        if (value != null!) {
-            return value;
-        }
-
-        throw new RuntimeError(name, $"Variable '{name.lexeme}' has not been assigned to any value.");
+    public object GetAt(int index, int? distance) {
+        return Ancestor(distance)._values[index];
     }
 
     private Environment Ancestor(int? distance) {
@@ -48,22 +26,7 @@ public class Environment {
         return environment;
     }
 
-    public void Assign(Token name, object value) {
-        if (values.ContainsKey(name.lexeme)) {
-            values[name.lexeme] = value;
-            return;
-        }
-        
-        // Assign to any matching variable above current scope
-        if (enclosing != null) {
-            enclosing.Assign(name, value);
-            return;
-        }
-
-        throw new RuntimeError(name, $"Undefined variable '{name.lexeme}'.");
-    }
-
-    public void AssignAt(Token name, object value, int? distance) {
-        Ancestor(distance).values[name.lexeme] = value;
+    public void AssignAt(int index, object value, int? distance) {
+        Ancestor(distance)._values[index] = value;
     }
 }

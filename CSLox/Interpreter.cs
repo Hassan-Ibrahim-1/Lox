@@ -5,19 +5,25 @@ namespace Lox;
 // IStmtVisitor here just returns null all the time
 public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     // current environment, not necessarily global
-    private readonly Environment _globals = new Environment();
-    private Environment _environment;
+    private readonly HashMap<string, object> _globals = new HashMap<string, object>();
+    // TODO: Does this have to be initialized?
+    private Environment _environment = new Environment();
 
+    // Contains distance to local variable
     private readonly HashMap<Expr, int?> _locals = new HashMap<Expr, int?>();
+    // Contains the indices for where local variables are stored in an environment
+    private readonly HashMap<Expr, int> _localIndices = new HashMap<Expr, int>();
 
     public Interpreter() {
-        _environment = _globals;
+        // TODO: Figure this out
+    
+        // _environment = _globals;
         
         Token clockToken = new Token(TokenType.Identifier, "clock", null!, 0);
-        _globals.Define(clockToken, new Clock());
+        /*_globals.Define(clockToken, new Clock());*/
 
         Token exitToken = new Token(TokenType.Identifier, "exit", null!, 0);
-        _globals.Define(exitToken, new Exit());
+        /*_globals.Define(exitToken, new Exit());*/
     }
 
    public void Interpret(List<Stmt> stmts) {
@@ -30,7 +36,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
             Lox.RuntimeError(e);
         }
     }
-
+   
     public object VisitExpressionStmt(Expression stmt) {
         Evaluate(stmt.expression);
         return null!;
@@ -103,11 +109,11 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     public object VisitAssignmentExpr(Assignment expr) {
         object value = Evaluate(expr.value);
         if (_locals.ContainsKey(expr)) {
-            _environment.AssignAt(expr.name, value, _locals[expr]);
+            _environment.AssignAt(_localIndices[expr], value, _locals[expr]);
         }
         // globals
         else {
-            _environment.Assign(expr.name, value);
+            _globals[expr.name.lexeme] = value;
         }
 
         return value;
@@ -141,11 +147,11 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         int? distance = _locals.Get(expr);
 
         if (distance != null) {
-            return _environment.GetAt(name, distance);
+            return _environment.GetAt(_localIndices[expr], distance);
         }
         // global
         else {
-            return _globals.Get(name);
+            return _globals[name.lexeme];
         }
     }
 
