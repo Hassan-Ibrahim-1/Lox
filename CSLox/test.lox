@@ -1,10 +1,11 @@
 fun varTest() {
-    var a = "bad";
+    var a;
     fun func() {
-        var a = "please work";
+        var a = "it works!";
         print a;
     }
     func();
+    print a;
 }
 
 varTest();

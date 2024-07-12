@@ -11,7 +11,7 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
     private enum VarState {
         Declared,
         Defined,
-        Used
+        Read
     }
 
     private readonly Interpreter _interpreter;
@@ -58,7 +58,7 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
         for (int i = scopes.Count - 1; i >= 0; i--) {
             if (scopes.ElementAt(i).ContainsKey(name.lexeme)) {
                 _interpreter.Resolve(expr, i);
-                scopes.ElementAt(i)[name.lexeme] = VarState.Used;
+                scopes.ElementAt(i)[name.lexeme] = VarState.Read;
             }
         } 
     }
@@ -70,7 +70,7 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
     private void EndScope() {
         HashMap<string, VarState> scope = scopes.Peek();
         foreach (string key in scope.Keys) {
-            if (scope[key] != VarState.Used) {
+            if (scope[key] != VarState.Read) {
                 CPrint.Print($"Warning: Local variable '{key}' never used.", ConsoleColor.Yellow);
             }
         }
@@ -160,7 +160,7 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
 
     public object VisitVariableExpr(Variable expr) {
         if (scopes.Count != 0 && scopes.Peek().ContainsKey(expr.name.lexeme)) {
-            if (scopes.Peek()[expr.name.lexeme] != VarState.Defined) {
+            if (scopes.Peek()[expr.name.lexeme] == VarState.Declared) {
                 Lox.Error(expr.name, "Can't read local variable in it's own initializer.");
             }
         }

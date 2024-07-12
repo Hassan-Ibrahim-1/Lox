@@ -30,7 +30,12 @@ public class Environment {
     }
 
     public object GetAt(Token name, int? distance) {
-        return Ancestor(distance).values[name.lexeme];
+        object value = Ancestor(distance).values[name.lexeme];
+        if (value != null!) {
+            return value;
+        }
+
+        throw new RuntimeError(name, $"Variable '{name.lexeme}' has not been assigned to any value.");
     }
 
     private Environment Ancestor(int? distance) {

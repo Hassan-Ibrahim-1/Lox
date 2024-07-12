@@ -6,7 +6,8 @@ class HashMap<TK, TV> : Dictionary<TK, TV> where TK : notnull {
         if (this.TryGetValue(key, out TV? value)) {
             return value;
         }
-
+        
+        // null?
         return default(TV)!;
     }
 
