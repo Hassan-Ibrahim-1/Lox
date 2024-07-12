@@ -29,11 +29,11 @@ public class Environment {
         throw new RuntimeError(name, $"Undefined variable '{name.lexeme}'.");
     }
 
-    public object GetAt(Token name, int distance) {
+    public object GetAt(Token name, int? distance) {
         return Ancestor(distance).values[name.lexeme];
     }
 
-    private Environment Ancestor(int distance) {
+    private Environment Ancestor(int? distance) {
         // if distance is 0 then the variable is the in the current environment
         Environment environment = this;
         for (int i = 0; i < distance; i++) {
@@ -58,7 +58,7 @@ public class Environment {
         throw new RuntimeError(name, $"Undefined variable '{name.lexeme}'.");
     }
 
-    public void AssignAt(Token name, object value, int distance) {
+    public void AssignAt(Token name, object value, int? distance) {
         Ancestor(distance).values[name.lexeme] = value;
     }
 }

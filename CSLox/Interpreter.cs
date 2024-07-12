@@ -1,3 +1,5 @@
+using Lox.Collections;
+
 namespace Lox;
 
 // IStmtVisitor here just returns null all the time
@@ -6,7 +8,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     private readonly Environment _globals = new Environment();
     private Environment _environment;
 
-    private readonly Dictionary<Expr, int> _locals = new Dictionary<Expr, int>();
+    private readonly HashMap<Expr, int?> _locals = new HashMap<Expr, int?>();
 
     public Interpreter() {
         _environment = _globals;
@@ -136,8 +138,10 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     }
 
     private object LookUpVariable(Token name, Variable expr) {
-        if (_locals.ContainsKey(expr)) {
-            return _environment.GetAt(name, _locals[expr]);
+        int? distance = _locals.Get(expr);
+
+        if (distance != null) {
+            return _environment.GetAt(name, distance);
         }
         // global
         else {
@@ -307,6 +311,6 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     }
 
     public void Resolve(Expr expr, int depth) {
-        _locals.Add(expr, depth);
+        _locals.Put(expr, depth);
     }
 }

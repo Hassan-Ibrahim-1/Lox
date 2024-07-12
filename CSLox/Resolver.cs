@@ -1,3 +1,5 @@
+using Lox.Collections;
+
 namespace Lox;
 
 public class Resolver : IVisitor<object>, IStmtVisitor<object> {
@@ -14,7 +16,7 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
 
     private readonly Interpreter _interpreter;
     // A stack of scopes
-    private readonly Stack<Dictionary<string, VarState>> scopes = new Stack<Dictionary<string, VarState>>();
+    private readonly Stack<HashMap<string, VarState>> scopes = new Stack<HashMap<string, VarState>>();
     private FunctionType _currentFunction = FunctionType.None;
 
     public Resolver(Interpreter interpreter) {
@@ -62,11 +64,11 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
     }
 
     private void BeginScope() {
-        scopes.Push(new Dictionary<string, VarState>());
+        scopes.Push(new HashMap<string, VarState>());
     }
 
     private void EndScope() {
-        Dictionary<string, VarState> scope = scopes.Peek();
+        HashMap<string, VarState> scope = scopes.Peek();
         foreach (string key in scope.Keys) {
             if (scope[key] != VarState.Used) {
                 CPrint.Print($"Warning: Local variable '{key}' never used.", ConsoleColor.Yellow);
