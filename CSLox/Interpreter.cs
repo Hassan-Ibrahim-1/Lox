@@ -7,7 +7,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     // current environment, not necessarily global
     private readonly HashMap<string, object> _globals = new HashMap<string, object>();
     // TODO: Does this have to be initialized?
-    private Environment _environment = new Environment();
+    private Environment _environment = null!;
 
     // Contains distance to local variable
     private readonly HashMap<Expr, int?> _locals = new HashMap<Expr, int?>();
@@ -19,11 +19,8 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     
         // _environment = _globals;
         
-        Token clockToken = new Token(TokenType.Identifier, "clock", null!, 0);
-        /*_globals.Define(clockToken, new Clock());*/
-
-        Token exitToken = new Token(TokenType.Identifier, "exit", null!, 0);
-        /*_globals.Define(exitToken, new Exit());*/
+        _globals.Add("clock", new Clock());
+        _globals.Add("exit", new Exit());
     }
 
    public void Interpret(List<Stmt> stmts) {
@@ -50,11 +47,19 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
 
     // Definition
     public object VisitVarStmt(Var stmt) {
+        // TODO: Figure this out.
+        // If current env == null?
         object value = null!;
         if (stmt.initializer != null) {
             value = Evaluate(stmt.initializer);
         }
-        _environment.Define(stmt.name, value);
+        if (_environment == null) {
+            _globals.Add(stmt.name.lexeme, value);
+        }
+
+        else {
+            _environment.Define(value);
+        }
         return null!;
     }
 
@@ -92,7 +97,12 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
 
     public object VisitFunctionStmt(Function stmt) {
         var function = new LoxFunction(stmt, _environment);
-        _environment.Define(stmt.name, function);
+        if (_environment == null) {
+            _globals.Add(stmt.name.lexeme, function);
+        }
+        else {
+            _environment.Define(function);
+        }
         return null!;
     }
 
@@ -316,7 +326,8 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         }
     }
 
-    public void Resolve(Expr expr, int depth) {
+    public void Resolve(Expr expr, int depth, int localIndex) {
         _locals.Put(expr, depth);
+        _localIndices.Put(expr, localIndex);
     }
 }

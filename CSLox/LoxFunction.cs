@@ -15,7 +15,7 @@ public class LoxFunction : LoxCallable {
         
         // Map arguments to parameters
         for (int i = 0; i < arguments.Count; i++) {
-            environment.Define(_declaration.functionExpr.parameters[i], arguments[i]);
+            environment.Define(arguments[i]);
         }
 
         try {

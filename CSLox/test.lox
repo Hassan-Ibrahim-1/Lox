@@ -1,3 +1,6 @@
+/*
+var a = "global a";
+
 fun varTest() {
     var a = "outer";
     fun func() {
@@ -13,3 +16,20 @@ fun varTest() {
 }
 
 varTest();
+fun make_counter() {
+var i = 0;
+
+fun counter() {
+i = i + 1;
+return i;
+}
+
+return counter;
+}
+
+var counter = make_counter();
+
+print counter();
+print counter();
+*/
+

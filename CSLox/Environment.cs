@@ -8,7 +8,7 @@ public class Environment {
         this.enclosing = enclosing;
     }
 
-    public void Define(Token name, object value) {
+    public void Define(object value) {
         _values.Add(value);
     }
 

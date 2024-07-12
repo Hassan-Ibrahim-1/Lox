@@ -14,10 +14,10 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
         Read
     }
 
+    private FunctionType _currentFunction = FunctionType.None;
     private readonly Interpreter _interpreter;
     // A stack of scopes
     private readonly Stack<HashMap<string, VarState>> scopes = new Stack<HashMap<string, VarState>>();
-    private FunctionType _currentFunction = FunctionType.None;
 
     public Resolver(Interpreter interpreter) {
         this._interpreter = interpreter;
@@ -55,10 +55,11 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
 
     // Used for binding variable names to their values when the variable is being used
     private void ResolveLocal(Expr expr, Token name) {
-        for (int i = scopes.Count - 1; i >= 0; i--) {
-            if (scopes.ElementAt(i).ContainsKey(name.lexeme)) {
-                _interpreter.Resolve(expr, i);
-                scopes.ElementAt(i)[name.lexeme] = VarState.Read;
+        for (int depth = scopes.Count - 1; depth >= 0; depth--) {
+            HashMap<string, VarState> scope = scopes.ElementAt(depth);
+            if (scope.ContainsKey(name.lexeme)) {
+                _interpreter.Resolve(expr, depth, scope.GetIndex(name.lexeme));
+                scopes.ElementAt(depth)[name.lexeme] = VarState.Read;
             }
         } 
     }
