@@ -1,48 +1,10 @@
-/*
-var a = "global a";
+class TestClass {
+    test() {
 
-fun varTest() {
-    var a = "outer";
-    fun func() {
-        var a = "inner";
-        {
-            var a = "innermost";
-            print a;
-        }
-        print a;
     }
-    func();
-    print a;
 }
 
-varTest();
+var testClass = TestClass();
 
-fun make_counter() {
-    var i = 0;
-
-    fun counter() {
-        i = i + 1;
-        return i;
-    }
-
-    return counter;
-}
-
-var counter = make_counter();
-
-print counter();
-print counter();
-*/
-var a = 2;
-
-{
-    fun ShowA() {
-        print a;
-    }
-    ShowA();
-    var a = 3;
-    ShowA();
-}
-
-var a = 5;
+print testClass;
 

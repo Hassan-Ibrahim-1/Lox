@@ -16,6 +16,10 @@ public class Environment {
         return Ancestor(distance)._values[index];
     }
 
+    public void AssignAt(int index, object value, int? distance) {
+        Ancestor(distance)._values[index] = value;
+    }
+
     private Environment Ancestor(int? distance) {
         // if distance is 0 then the variable is the in the current environment
         Environment environment = this;
@@ -24,9 +28,5 @@ public class Environment {
         }
 
         return environment;
-    }
-
-    public void AssignAt(int index, object value, int? distance) {
-        Ancestor(distance)._values[index] = value;
     }
 }

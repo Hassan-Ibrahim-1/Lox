@@ -28,7 +28,8 @@ public class GenerateAST {
                 "While : Expr condition, Stmt body",
                 "Break : Null null",
                 "Function : Token name, FunctionExpr functionExpr",
-                "Return : Token keyword, Expr value"
+                "Return : Token keyword, Expr value",
+                "Class : Token name, List<Function> methods",
             });
     }
 

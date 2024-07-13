@@ -29,6 +29,19 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         }
     }
    
+    public object VisitClassStmt(Class stmt) {
+         LoxClass loxClass = new LoxClass(stmt.name.lexeme);
+
+        if (_environment == null) {
+            AssignGlobalValue(stmt.name, loxClass);
+        }
+        else {
+            _environment.Define(loxClass);
+        }
+
+        return null!;
+    }
+
     public object VisitExpressionStmt(Expression stmt) {
         Evaluate(stmt.expression);
         return null!;
@@ -238,11 +251,11 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
             arguments.Add(value!);
         }
 
-        if (!(callee is LoxCallable)) {
+        if (!(callee is ILoxCallable)) {
             throw new RuntimeError(expr.paren, "Can only call functions and classes.");
         }
 
-        LoxCallable function = (LoxCallable)callee;
+        ILoxCallable function = (ILoxCallable)callee;
 
         if (arguments.Count != function.Arity()) {
             throw new RuntimeError(expr.paren, $"Expected {function.Arity()} argument(s) but got {arguments.Count}.");
@@ -273,7 +286,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
             }
             return text;
         }
-        return obj.ToString()!.ToLower();
+        return obj.ToString()!;
     }
 
     private static void CheckNumberOperand(Token op, object operand) {

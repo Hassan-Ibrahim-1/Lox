@@ -25,17 +25,33 @@ public class Parser {
 
     private Stmt Declaration() {
         try {
+            if (Match(TokenType.Class)) return ClassDeclaration();
             if (Match(TokenType.Var)) return VarDeclaration();
             if (Check(TokenType.Fun) && CheckNext(TokenType.Identifier)) {
                 Consume(TokenType.Fun, null!);
                 return Function("function");
             }
+
             return Statement();
         }
         catch (ParseError) {
             Synchronize();
             return null!;
         }
+    }
+
+    private Stmt ClassDeclaration() {
+        Token name = Consume(TokenType.Identifier, "Expect class name.");
+        Consume(TokenType.Left_Brace, "Expect '{' after class name.");
+        
+        List<Function> methods = new List<Function>();
+        
+        while (!Check(TokenType.Right_Brace) && !IsAtEnd()) {
+            methods.Add((Function)Function("method"));
+        }
+
+        Consume(TokenType.Right_Brace, "Expect '}' after class body.");
+        return new Class(name, methods);
     }
 
     private Stmt VarDeclaration() {

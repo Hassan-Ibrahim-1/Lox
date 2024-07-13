@@ -10,6 +10,7 @@ public interface IStmtVisitor<R> {
     R VisitBreakStmt(Break stmt);
     R VisitFunctionStmt(Function stmt);
     R VisitReturnStmt(Return stmt);
+    R VisitClassStmt(Class stmt);
 }
 
 public abstract class Stmt {
@@ -113,4 +114,15 @@ public class Return : Stmt {
         return visitor.VisitReturnStmt(this);
     }
 }
+public class Class : Stmt {
+    public readonly Token name;
+    public readonly List<Function> methods;
 
+    public Class(Token name, List<Function> methods) {
+        this.name = name;
+        this.methods = methods;
+    }
+    public override R Accept<R>(IStmtVisitor<R> visitor) {
+        return visitor.VisitClassStmt(this);
+    }
+}

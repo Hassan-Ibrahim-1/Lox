@@ -101,6 +101,12 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
         return null!;
     }
 
+    public object VisitClassStmt(Class stmt) {
+        Declare(stmt.name);
+        Define(stmt.name);
+        return null!;
+    }
+
     public object VisitVarStmt(Var stmt) {
         Declare(stmt.name);
         if (stmt.initializer != null) {

@@ -1,6 +1,6 @@
 namespace Lox;
 
-public interface LoxCallable {
+public interface ILoxCallable {
     object Call(Interpreter interpreter, List<object> arguments);
     int Arity();
 }

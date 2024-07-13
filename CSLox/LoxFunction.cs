@@ -1,6 +1,6 @@
 namespace Lox;
 
-public class LoxFunction : LoxCallable {
+public class LoxFunction : ILoxCallable {
     private readonly Function _declaration;
     // Scope where the function is declared in
     private readonly Environment _closure;

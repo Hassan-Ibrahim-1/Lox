@@ -1,6 +1,6 @@
 namespace Lox;
 
-public class Clock : LoxCallable {
+public class Clock : ILoxCallable {
     public int Arity() {
         return 0;
     }
@@ -14,7 +14,7 @@ public class Clock : LoxCallable {
     }
 }
 
-public class Exit : LoxCallable {
+public class Exit : ILoxCallable {
     public int Arity() {
         return 1;
     }
