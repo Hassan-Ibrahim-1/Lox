@@ -261,7 +261,28 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
             throw new RuntimeError(expr.paren, $"Expected {function.Arity()} argument(s) but got {arguments.Count}.");
         }
 
+        // Also returns a LoxInstance when a class is called
         return function.Call(this, arguments);
+    }
+
+    public object VisitGetExpr(Get expr) {
+        object obj = Evaluate(expr.obj);
+        if (obj is LoxInstance e) {
+            return e.Get(expr.name);
+        }
+        
+        throw new RuntimeError(expr.name, "Only instances have properties.");
+    }
+
+    public object VisitSetExpr(Set expr) {
+        // Evaluates the Getter
+        object obj = Evaluate(expr.obj);
+        if (obj is LoxInstance e) {
+            object value = Evaluate(expr.value);
+            e.Set(expr.name, value);
+            return value;
+        }
+        throw new RuntimeError(expr.name, "Only instances have fields.");
     }
 
     public object VisitFunctionExpr(FunctionExpr expr) {

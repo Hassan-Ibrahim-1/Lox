@@ -1,10 +1,10 @@
 class TestClass {
-    test() {
-
-    }
 }
 
 var testClass = TestClass();
 
-print testClass;
+testClass.field = TestClass();
 
+testClass.field.field2 = TestClass();
+
+print testClass.field.field2.newField = "it works";

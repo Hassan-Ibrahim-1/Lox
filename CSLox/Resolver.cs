@@ -222,4 +222,16 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
         }
         return null!;
     }
+
+    public object VisitGetExpr(Get expr) {
+        // properties don't get resolved because they're looked up dynamically
+        Resolve(expr.obj);
+        return null!;
+    }
+
+    public object VisitSetExpr(Set expr) {
+        Resolve(expr.obj);
+        Resolve(expr.value);
+        return null!;
+    }
 }

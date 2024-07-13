@@ -260,6 +260,9 @@ public class Parser {
             if (expr is Variable variable) {
                 return new Assignment(variable.name, value);
             }
+            else if (expr is Get get) {
+                return new Set(get.obj, get.name, value);
+            }
             Error(equals, "Invalid assignment target.");
         }
         return expr;
@@ -364,6 +367,14 @@ public class Parser {
         while (true) {
             if (Match(TokenType.Left_Paren)) {
                 expr = FinishCall(expr);
+            }
+            else if (Match(TokenType.Dot)) {
+                Token name = Consume(TokenType.Identifier, "Expect identifier after '.'.");
+                
+                // expr is the object that we're getting the property of
+                // name is the name of the property that we're accessing
+                // Don't return to allow chaining of properties
+                expr = new Get(expr, name); 
             }
             else {
                 break;

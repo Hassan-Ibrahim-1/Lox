@@ -11,6 +11,8 @@ public interface IVisitor<R> {
     R VisitTernaryExpr(Ternary expr);
     R VisitCallExpr(Call expr);
     R VisitFunctionExpr(FunctionExpr expr);
+    R VisitGetExpr(Get expr);
+    R VisitSetExpr(Set expr);
 }
 
 public abstract class Expr {
@@ -137,5 +139,31 @@ public class FunctionExpr : Expr {
     }
     public override R Accept<R>(IVisitor<R> visitor) {
         return visitor.VisitFunctionExpr(this);
+    }
+}
+public class Get : Expr {
+    public readonly Expr obj;
+    public readonly Token name;
+
+    public Get(Expr obj, Token name) {
+        this.obj = obj;
+        this.name = name;
+    }
+    public override R Accept<R>(IVisitor<R> visitor) {
+        return visitor.VisitGetExpr(this);
+    }
+}
+public class Set : Expr {
+    public readonly Expr obj;
+    public readonly Token name;
+    public readonly Expr value;
+
+    public Set(Expr obj, Token name, Expr value) {
+        this.obj = obj;
+        this.name = name;
+        this.value = value;
+    }
+    public override R Accept<R>(IVisitor<R> visitor) {
+        return visitor.VisitSetExpr(this);
     }
 }
