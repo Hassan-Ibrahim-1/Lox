@@ -79,12 +79,15 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
     }
 
     private void Declare(Token name) {
-        if (scopes.Count == 0) return;
+        if (scopes.Count == 0) return; // global
+        if (scopes.Peek().ContainsKey(name.lexeme)) {
+           Lox.Error(name, $"'{name.lexeme}' has already been defined");
+        }
         scopes.Peek()[name.lexeme] = VarState.Declared;
     }
 
     private void Define(Token name) {
-        if (scopes.Count == 0) return;
+        if (scopes.Count == 0) return; // global
         scopes.Peek()[name.lexeme] = VarState.Defined;
     }
     

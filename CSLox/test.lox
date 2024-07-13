@@ -16,15 +16,16 @@ fun varTest() {
 }
 
 varTest();
+
 fun make_counter() {
-var i = 0;
+    var i = 0;
 
-fun counter() {
-i = i + 1;
-return i;
-}
+    fun counter() {
+        i = i + 1;
+        return i;
+    }
 
-return counter;
+    return counter;
 }
 
 var counter = make_counter();
@@ -32,4 +33,16 @@ var counter = make_counter();
 print counter();
 print counter();
 */
+var a = 2;
+
+{
+    fun ShowA() {
+        print a;
+    }
+    ShowA();
+    var a = 3;
+    ShowA();
+}
+
+var a = 5;
 

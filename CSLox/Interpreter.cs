@@ -6,7 +6,6 @@ namespace Lox;
 public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     // current environment, not necessarily global
     private readonly HashMap<string, object> _globals = new HashMap<string, object>();
-    // TODO: Does this have to be initialized?
     private Environment _environment = null!;
 
     // Contains distance to local variable
@@ -15,10 +14,6 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     private readonly HashMap<Expr, int> _localIndices = new HashMap<Expr, int>();
 
     public Interpreter() {
-        // TODO: Figure this out
-    
-        // _environment = _globals;
-        
         _globals.Add("clock", new Clock());
         _globals.Add("exit", new Exit());
     }
@@ -47,14 +42,12 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
 
     // Definition
     public object VisitVarStmt(Var stmt) {
-        // TODO: Figure this out.
-        // If current env == null?
         object value = null!;
         if (stmt.initializer != null) {
             value = Evaluate(stmt.initializer);
         }
         if (_environment == null) {
-            _globals.Add(stmt.name.lexeme, value);
+            AssignGlobalValue(stmt.name, value);
         }
 
         else {
@@ -98,7 +91,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     public object VisitFunctionStmt(Function stmt) {
         var function = new LoxFunction(stmt, _environment);
         if (_environment == null) {
-            _globals.Add(stmt.name.lexeme, function);
+            AssignGlobalValue(stmt.name, function);
         }
         else {
             _environment.Define(function);
@@ -123,7 +116,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         }
         // globals
         else {
-            _globals[expr.name.lexeme] = value;
+            GetGlobalValue(expr.name);
         }
 
         return value;
@@ -161,7 +154,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         }
         // global
         else {
-            return _globals[name.lexeme];
+            return GetGlobalValue(name);
         }
     }
 
@@ -299,6 +292,22 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     private static void CheckNumberOperands(Token op, object left, object right) {
         if (left is double && right is double) return;
         throw new RuntimeError(op, "Operands must be numbers");
+    }
+
+    private object GetGlobalValue(Token name) {
+        if (!_globals.ContainsKey(name.lexeme)) {
+            throw new RuntimeError(name, $"Undefined variable '{name.lexeme}'");
+        }
+
+        return _globals[name.lexeme];
+    }
+
+    private void AssignGlobalValue(Token name, object value) {
+        if (_globals.ContainsKey(name.lexeme)) {
+            throw new RuntimeError(name, $"Global '{name.lexeme}' has already been defined.");
+        }
+        
+        _globals.Add(name.lexeme, value);
     }
 
     private object Evaluate(Expr expr) {

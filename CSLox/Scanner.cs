@@ -170,9 +170,9 @@ public class Scanner {
                 nestLevel++;
             }
             else if (Peek() == '*' && MatchNext('/')) {
-                Next();
                 nestLevel--;
             }
+
             Next();
         }
         if (IsAtEnd() && nestLevel > 0) {
