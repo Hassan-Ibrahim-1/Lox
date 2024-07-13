@@ -54,6 +54,7 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
     }
 
     // Used for binding variable names to their values when the variable is being used
+    // Depth is how far back the scope in which the variable is declared is compared to the current scope
     private void ResolveLocal(Expr expr, Token name) {
         for (int depth = scopes.Count - 1; depth >= 0; depth--) {
             HashMap<string, VarState> scope = scopes.ElementAt(depth);
@@ -70,11 +71,13 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
 
     private void EndScope() {
         HashMap<string, VarState> scope = scopes.Peek();
+
         foreach (string key in scope.Keys) {
             if (scope[key] != VarState.Read) {
                 CPrint.Print($"Warning: Local variable '{key}' never used.", ConsoleColor.Yellow);
             }
         }
+
         scopes.Pop();
     }
 
