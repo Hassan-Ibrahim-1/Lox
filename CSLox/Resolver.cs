@@ -6,6 +6,7 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
     private enum FunctionType {
         None,
         Function,
+        Method
     }
 
     private enum VarState {
@@ -54,15 +55,15 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
     }
 
     // Used for binding variable names to their values when the variable is being used
-    // Depth is how far back the scope in which the variable is declared is compared to the current scope
+    // Depth is how far back the scope in which the variable is declared in compared to the current scope
     private void ResolveLocal(Expr expr, Token name) {
         for (int depth = scopes.Count - 1; depth >= 0; depth--) {
             HashMap<string, VarState> scope = scopes.ElementAt(depth);
             if (scope.ContainsKey(name.lexeme)) {
                 _interpreter.Resolve(expr, depth, scope.GetIndex(name.lexeme));
-                scopes.ElementAt(depth)[name.lexeme] = VarState.Read;
+                scope[name.lexeme] = VarState.Read;
             }
-        } 
+        }
     }
 
     private void BeginScope() {
@@ -104,6 +105,18 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
     public object VisitClassStmt(Class stmt) {
         Declare(stmt.name);
         Define(stmt.name);
+        
+        // The entire class has its own separate scope
+        // this is declared as a class-wide variable
+        BeginScope();
+        scopes.Peek().Put("this", VarState.Read);
+
+        foreach (Function method in stmt.methods) {
+            FunctionType declaration = FunctionType.Method;
+            ResolveFunction(method.functionExpr, declaration);
+        }
+
+        EndScope();
         return null!;
     }
 
@@ -232,6 +245,11 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
     public object VisitSetExpr(Set expr) {
         Resolve(expr.obj);
         Resolve(expr.value);
+        return null!;
+    }
+
+    public object VisitThisExpr(This expr) {
+        ResolveLocal(expr, expr.keyword);
         return null!;
     }
 }

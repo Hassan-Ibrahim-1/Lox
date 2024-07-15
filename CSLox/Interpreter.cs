@@ -30,7 +30,14 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     }
    
     public object VisitClassStmt(Class stmt) {
-         LoxClass loxClass = new LoxClass(stmt.name.lexeme);
+        Dictionary<string, LoxFunction> methods = new Dictionary<string, LoxFunction>();       
+        
+        foreach (Function method in stmt.methods) {
+            LoxFunction function = new LoxFunction(method, this._environment);
+            methods.Add(method.name.lexeme, function);
+        }
+
+        LoxClass loxClass = new LoxClass(stmt.name.lexeme, methods);
 
         if (_environment == null) {
             AssignGlobalValue(stmt.name, loxClass);
@@ -159,7 +166,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         return LookUpVariable(expr.name, expr);
     }
 
-    private object LookUpVariable(Token name, Variable expr) {
+    private object LookUpVariable(Token name, Expr expr) {
         int? distance = _locals.Get(expr);
 
         if (distance != null) {
@@ -240,6 +247,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     }
 
     public object VisitCallExpr(Call expr) {
+        // callee can be anything that implements ILoxCallable
         object callee = Evaluate(expr.callee);
         var arguments = new List<object>();
         
@@ -291,12 +299,16 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         return new LoxFunction(function, _environment);
     }
 
+    public object VisitThisExpr(This expr) {
+        return LookUpVariable(expr.keyword, expr);
+    }
+
     private static bool IsTrue(object obj) {
         if (obj is Nil) return false;
         if (obj is bool) return (bool)obj;
         return true;
     }
-    
+
     private static string Stringify(object obj) {
         if (obj is Nil) return "nil";
 

@@ -13,6 +13,7 @@ public interface IVisitor<R> {
     R VisitFunctionExpr(FunctionExpr expr);
     R VisitGetExpr(Get expr);
     R VisitSetExpr(Set expr);
+    R VisitThisExpr(This expr);
 }
 
 public abstract class Expr {
@@ -167,3 +168,16 @@ public class Set : Expr {
         return visitor.VisitSetExpr(this);
     }
 }
+
+public class This : Expr {
+    public readonly Token keyword;
+
+    public This(Token keyword) {
+        this.keyword = keyword;
+    }
+
+    public override R Accept<R>(IVisitor<R> visitor) {
+        return visitor.VisitThisExpr(this);
+    }
+}
+

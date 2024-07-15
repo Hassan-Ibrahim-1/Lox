@@ -20,6 +20,7 @@ public class GenerateAST {
                 "FunctionExpr: List<Token> parameters, List<Stmt> body",
                 "Get : Expr obj, Token name",
                 "Set : Expr obj, Token name, Expr value",
+                "This : Token keyword",
             });
         DefineAST(outputDir, "Stmt", new List<string>() {
                 "Expression : Expr expression",

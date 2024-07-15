@@ -364,8 +364,10 @@ public class Parser {
     private Expr Call() {
         Expr expr = Primary();
 
+        // Deals with the this keyword as well
         while (true) {
             if (Match(TokenType.Left_Paren)) {
+                // Also handles methods
                 expr = FinishCall(expr);
             }
             else if (Match(TokenType.Dot)) {
@@ -387,8 +389,7 @@ public class Parser {
     private Expr FinishCall(Expr expr) {
         var arguments = new List<Expr>();
         if (!Check(TokenType.Right_Paren)) {
-            do
-            {
+            do {
                 if (arguments.Count > 255) {
                     Error(Peek(), "Can't have more than 255 arguments.");
                 }
@@ -397,7 +398,6 @@ public class Parser {
         }
 
         Token paren = Consume(TokenType.Right_Paren, "Expect ')' after arguments");
-        
         return new Call(expr, paren, arguments);
     }
 
@@ -405,6 +405,7 @@ public class Parser {
         if (Match(TokenType.False)) return new Literal(false);
         if (Match(TokenType.True)) return new Literal(true);
         if (Match(TokenType.Nil)) return new Literal(new Nil());
+        if (Match(TokenType.This)) return new This(Previous());
         if (Match(TokenType.String, TokenType.Number)) {
             return new Literal(Previous().literal);
         }

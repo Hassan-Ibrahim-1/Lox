@@ -10,6 +10,12 @@ public class LoxFunction : ILoxCallable {
         this._closure = closure;
     }
 
+    public LoxFunction Bind(LoxInstance instance) {
+        Environment environment = new Environment(_closure);
+        environment.Define(instance);
+        return new LoxFunction(_declaration, environment);
+    }
+
     public object Call(Interpreter interpreter, List<object> arguments) {
         Environment environment = new Environment(_closure);
         

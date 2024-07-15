@@ -1,10 +1,10 @@
 class TestClass {
+    testMethod() {
+        var test = "local var works";
+        return this.field + test;
+    }
 }
 
-var testClass = TestClass();
-
-testClass.field = TestClass();
-
-testClass.field.field2 = TestClass();
-
-print testClass.field.field2.newField = "it works";
+var test = TestClass();
+test.field = "field works ";
+print test.testMethod();
