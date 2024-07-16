@@ -16,7 +16,7 @@ public class LoxInstance {
             return value;
         }
 
-        LoxFunction method = _loxClass.FindMethod(name);
+        LoxFunction method = _loxClass.FindMethod(name.lexeme);
         // Create a new environment when a method is encountered at runtime
         if (method != null) {
             return method.Bind(this);

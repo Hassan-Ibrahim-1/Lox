@@ -9,8 +9,8 @@ public class LoxClass : ILoxCallable {
         this.methods = methods;
     }
 
-    public LoxFunction FindMethod(Token name) {
-        if (methods.TryGetValue(name.lexeme, out LoxFunction? method)) {
+    public LoxFunction FindMethod(string name) {
+        if (methods.TryGetValue(name, out LoxFunction? method)) {
             return method;
         }
 
@@ -18,11 +18,19 @@ public class LoxClass : ILoxCallable {
     }
 
     public int Arity() {
-        return 0;
+        LoxFunction initializer = FindMethod("init");
+        if (initializer == null) return 0;
+        return initializer.Arity(); // the class has the same arity as the init function
     }
 
+    /// Create a new instance
     public object Call(Interpreter interpreter, List<object> args) {
         LoxInstance instance = new LoxInstance(this);
+        LoxFunction initializer = FindMethod("init");
+        if (initializer != null) {
+            // Create an init function that has the new instance binded to it and call that instead
+            initializer.Bind(instance).Call(interpreter, args);
+        }
         return instance;
     }
 

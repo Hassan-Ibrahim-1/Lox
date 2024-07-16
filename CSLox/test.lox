@@ -1,10 +1,13 @@
 class TestClass {
+    init(f) {
+        this.f = f;
+    }
+
     testMethod() {
-        var test = "local var works";
-        return this.field + test;
+        print this.f;
     }
 }
 
-var test = TestClass();
-test.field = "field works ";
-print test.testMethod();
+var test = TestClass("it works!");
+var method = test.testMethod;
+method();
