@@ -4,7 +4,7 @@ namespace Lox;
 
 public class LoxInstance {
     private LoxClass _loxClass;
-    // Could just be a regular dictionary
+    // NOTE: Could just be a regular dictionary. Maybe?
     private readonly HashMap<string, object> fields = new HashMap<string, object>();
 
     public LoxInstance(LoxClass loxClass) {

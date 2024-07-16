@@ -263,14 +263,15 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
             throw new RuntimeError(expr.paren, "Can only call functions and classes.");
         }
 
-        ILoxCallable function = (ILoxCallable)callee;
+        // Could be a class initializer
+        ILoxCallable callable = (ILoxCallable)callee;
 
-        if (arguments.Count != function.Arity()) {
-            throw new RuntimeError(expr.paren, $"Expected {function.Arity()} argument(s) but got {arguments.Count}.");
+        if (arguments.Count != callable.Arity()) {
+            throw new RuntimeError(expr.paren, $"Expected {callable.Arity()} argument(s) but got {arguments.Count}.");
         }
 
         // Also returns a LoxInstance when a class is called
-        return function.Call(this, arguments);
+        return callable.Call(this, arguments);
     }
 
     public object VisitGetExpr(Get expr) {
@@ -300,6 +301,8 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     }
 
     public object VisitThisExpr(This expr) {
+        // the 'this' keyword is used to lookup the variable because that's what the variabled is declared as in resolver
+        // this is a reference to a class instance
         return LookUpVariable(expr.keyword, expr);
     }
 

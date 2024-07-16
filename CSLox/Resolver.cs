@@ -9,6 +9,11 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
         Method
     }
 
+    private enum ClassType {
+        None,
+        Class
+    }
+
     private enum VarState {
         Declared,
         Defined,
@@ -16,6 +21,8 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
     }
 
     private FunctionType _currentFunction = FunctionType.None;
+    private ClassType _currentClass = ClassType.None;
+
     private readonly Interpreter _interpreter;
     // A stack of scopes
     private readonly Stack<HashMap<string, VarState>> scopes = new Stack<HashMap<string, VarState>>();
@@ -105,10 +112,11 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
     public object VisitClassStmt(Class stmt) {
         Declare(stmt.name);
         Define(stmt.name);
-        
         // The entire class has its own separate scope
         // this is declared as a class-wide variable
         BeginScope();
+        ClassType enclosingClass = _currentClass;
+        _currentClass = ClassType.Class;
         scopes.Peek().Put("this", VarState.Read);
 
         foreach (Function method in stmt.methods) {
@@ -117,6 +125,7 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
         }
 
         EndScope();
+        _currentClass = enclosingClass;
         return null!;
     }
 
@@ -249,6 +258,11 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
     }
 
     public object VisitThisExpr(This expr) {
+        if (_currentClass == ClassType.None) {
+            Lox.Error(expr.keyword, "'this' statement cannot be outside a class");
+            return null!;
+        }
+
         ResolveLocal(expr, expr.keyword);
         return null!;
     }
