@@ -10,6 +10,8 @@ public class LoxFunction : ILoxCallable {
         this._closure = closure;
     }
 
+    // Bind an instance of a class to a newly created environment in the method when called
+    // Returns a new instance of the method referenced with the new binding
     public LoxFunction Bind(LoxInstance instance) {
         Environment environment = new Environment(_closure);
         environment.Define(instance);

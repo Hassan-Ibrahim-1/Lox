@@ -415,6 +415,7 @@ public class Parser {
         }
         // Anonymous function
         if (Match(TokenType.Fun)) {
+            // TODO: maybe call this lambda?
             return FunctionBody("function");
         }
         if (Match(TokenType.Left_Paren)) {
