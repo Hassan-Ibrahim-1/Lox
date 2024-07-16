@@ -1,13 +1,14 @@
-class TestClass {
-    init(f) {
-        this.f = f;
-    }
-
-    testMethod() {
-        print this.f;
+class Test {
+    init() {
+        return;
     }
 }
 
-var test = TestClass("it works!");
-var method = test.testMethod;
-method();
+var test = Test();
+print test.init();
+
+fun init() {
+    return "good";
+}
+
+print init();

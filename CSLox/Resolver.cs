@@ -6,6 +6,7 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
     private enum FunctionType {
         None,
         Function,
+        Initializer,
         Method
     }
 
@@ -120,7 +121,10 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
         scopes.Peek().Put("this", VarState.Read);
 
         foreach (Function method in stmt.methods) {
-            FunctionType declaration = FunctionType.Method;
+            FunctionType declaration = method.name.lexeme == "init"
+                ? FunctionType.Initializer
+                : FunctionType.Method;
+
             ResolveFunction(method.functionExpr, declaration);
         }
 
@@ -178,7 +182,14 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
         if (_currentFunction == FunctionType.None) {
             Lox.Error(stmt.keyword, "A return statement cannot be outside a function body.");
         }
-        if (stmt.value != null) Resolve(stmt.value);
+        if (stmt.value != null) {
+            if (_currentFunction == FunctionType.Initializer) {
+                Lox.Error(stmt.keyword, "A return statement cannot be inside a class initalizer");
+            }
+
+            Resolve(stmt.value);
+        }
+
         return null!;
     }
 

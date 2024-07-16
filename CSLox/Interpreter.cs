@@ -33,7 +33,8 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         Dictionary<string, LoxFunction> methods = new Dictionary<string, LoxFunction>();       
         
         foreach (Function method in stmt.methods) {
-            LoxFunction function = new LoxFunction(method, this._environment);
+            bool isInit = method.name.lexeme == "init";
+            LoxFunction function = new LoxFunction(method, this._environment, isInit);
             methods.Add(method.name.lexeme, function);
         }
 
@@ -109,7 +110,8 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     }
 
     public object VisitFunctionStmt(Function stmt) {
-        var function = new LoxFunction(stmt, _environment);
+        // Declaring a function
+        var function = new LoxFunction(stmt, _environment, false);
         if (_environment == null) {
             AssignGlobalValue(stmt.name, function);
         }
@@ -295,9 +297,10 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     }
 
     public object VisitFunctionExpr(FunctionExpr expr) {
+        // Visiting the function body
         Token name = new Token(TokenType.Nil, null!, null!, 0);
         Function function = new Function(name, expr);
-        return new LoxFunction(function, _environment);
+        return new LoxFunction(function, _environment, false);
     }
 
     public object VisitThisExpr(This expr) {
