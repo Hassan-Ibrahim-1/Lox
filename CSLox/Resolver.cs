@@ -7,7 +7,8 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
         None,
         Function,
         Initializer,
-        Method
+        Method,
+        Getter
     }
 
     private enum ClassType {
@@ -59,6 +60,15 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
         Resolve(expr.body);
         EndScope();
 
+        _currentFunction = enclosingFunction;
+    }
+
+    private void ResolveGetter(Getter getter) {
+        FunctionType enclosingFunction = _currentFunction;
+        _currentFunction = FunctionType.Getter;
+        BeginScope();
+        Resolve(getter.statements);
+        EndScope();
         _currentFunction = enclosingFunction;
     }
 
@@ -128,6 +138,10 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
             ResolveFunction(method.functionExpr, declaration);
         }
 
+        foreach(Getter getter in stmt.getters) {
+            ResolveGetter(getter);
+        }
+
         EndScope();
         _currentClass = enclosingClass;
         return null!;
@@ -190,6 +204,13 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
             Resolve(stmt.value);
         }
 
+        return null!;
+    }
+
+    public object VisitGetterStmt(Getter stmt) {
+        Declare(stmt.name);
+        Define(stmt.name);
+        Resolve(stmt.statements);
         return null!;
     }
 

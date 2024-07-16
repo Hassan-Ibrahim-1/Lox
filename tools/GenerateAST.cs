@@ -30,9 +30,10 @@ public class GenerateAST {
                 "If : Expr condition, Stmt thenBranch, Stmt elseBranch",
                 "While : Expr condition, Stmt body",
                 "Break : Null null",
-                "Function : Token name, FunctionExpr functionExpr",
+                "Function : Token name, FunctionExpr functionExpr, bool isStatic",
+                "Getter : Token name, List<Stmt> statements",
                 "Return : Token keyword, Expr value",
-                "Class : Token name, List<Function> methods",
+                "Class : Token name, List<Function> methods, List<Getter> getters",
             });
     }
 

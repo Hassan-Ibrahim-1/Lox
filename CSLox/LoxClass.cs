@@ -2,17 +2,26 @@ namespace Lox;
 
 public class LoxClass : LoxInstance, ILoxCallable {
     public readonly string name;
-    private readonly Dictionary<string, LoxFunction> methods;
+    private readonly Dictionary<string, LoxFunction> _methods;
+    private readonly Dictionary<string, LoxGetter> _getters;
 
-    public LoxClass(string name, Dictionary<string, LoxFunction> methods) {
+    public LoxClass(string name, Dictionary<string, LoxFunction> methods, Dictionary<string, LoxGetter> getters) {
         this.name = name;
-        this.methods = methods;
+        this._methods = methods;
+        this._getters = getters;
         SetLoxClass(this);
     }
 
     public LoxFunction FindMethod(string name) {
-        if (methods.TryGetValue(name, out LoxFunction? method)) {
+        if (_methods.TryGetValue(name, out LoxFunction? method)) {
             return method;
+        }
+        return null!;
+    }
+
+    public LoxGetter FindGetter(string name) {
+        if (_getters.TryGetValue(name, out LoxGetter? getter)) {
+            return getter;
         }
         return null!;
     }

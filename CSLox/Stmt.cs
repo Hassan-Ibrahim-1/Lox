@@ -9,6 +9,7 @@ public interface IStmtVisitor<R> {
     R VisitWhileStmt(While stmt);
     R VisitBreakStmt(Break stmt);
     R VisitFunctionStmt(Function stmt);
+    R VisitGetterStmt(Getter stmt);
     R VisitReturnStmt(Return stmt);
     R VisitClassStmt(Class stmt);
 }
@@ -104,6 +105,18 @@ public class Function : Stmt {
         return visitor.VisitFunctionStmt(this);
     }
 }
+public class Getter : Stmt {
+    public readonly Token name;
+    public readonly List<Stmt> statements;
+
+    public Getter(Token name, List<Stmt> statements) {
+        this.name = name;
+        this.statements = statements;
+    }
+    public override R Accept<R>(IStmtVisitor<R> visitor) {
+        return visitor.VisitGetterStmt(this);
+    }
+}
 public class Return : Stmt {
     public readonly Token keyword;
     public readonly Expr value;
@@ -119,10 +132,12 @@ public class Return : Stmt {
 public class Class : Stmt {
     public readonly Token name;
     public readonly List<Function> methods;
+    public readonly List<Getter> getters;
 
-    public Class(Token name, List<Function> methods) {
+    public Class(Token name, List<Function> methods, List<Getter> getters) {
         this.name = name;
         this.methods = methods;
+        this.getters = getters;
     }
     public override R Accept<R>(IStmtVisitor<R> visitor) {
         return visitor.VisitClassStmt(this);

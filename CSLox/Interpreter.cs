@@ -31,6 +31,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
    
     public object VisitClassStmt(Class stmt) {
         Dictionary<string, LoxFunction> methods = new Dictionary<string, LoxFunction>();       
+        Dictionary<string, LoxGetter> getters = new Dictionary<string, LoxGetter>();
         
         foreach (Function method in stmt.methods) {
             bool isInit = method.name.lexeme == "init";
@@ -38,7 +39,11 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
             methods.Add(method.name.lexeme, function);
         }
 
-        LoxClass loxClass = new LoxClass(stmt.name.lexeme, methods);
+        foreach (Getter getter in stmt.getters) {
+            getters.Add(getter.name.lexeme, new LoxGetter(getter, _environment));
+        }
+
+        LoxClass loxClass = new LoxClass(stmt.name.lexeme, methods, getters);
 
         if (_environment == null) {
             AssignGlobalValue(stmt.name, loxClass);
@@ -129,6 +134,13 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         }
 
         throw new ReturnException(value);
+    }
+
+    public object VisitGetterStmt(Getter stmt) {
+        // TODO: why?
+        LoxGetter getter = new LoxGetter(stmt, _environment);
+        _environment.Define(getter);
+        return null!;
     }
 
     public object VisitAssignmentExpr(Assignment expr) {
@@ -279,7 +291,11 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     public object VisitGetExpr(Get expr) {
         object obj = Evaluate(expr.obj);
         if (obj is LoxInstance e) {
-            return e.Get(expr.name);
+            object value = e.Get(expr.name);
+            if (value is LoxGetter getter) {
+                return getter.Call(this);
+            }
+            return value;
         }
         
         throw new RuntimeError(expr.name, "Only instances have properties.");

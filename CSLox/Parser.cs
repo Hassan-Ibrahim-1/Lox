@@ -45,13 +45,20 @@ public class Parser {
         Consume(TokenType.Left_Brace, "Expect '{' after class name.");
         
         List<Function> methods = new List<Function>();
+        List<Getter> getters = new List<Getter>();
         
         while (!Check(TokenType.Right_Brace) && !IsAtEnd()) {
-            methods.Add((Function)Method("method"));
+            Stmt stmt = Method("method");
+            if (stmt is Function e) {
+                methods.Add(e);
+            }
+            else {
+                getters.Add((Getter)stmt);
+            }
         }
 
         Consume(TokenType.Right_Brace, "Expect '}' after class body.");
-        return new Class(name, methods);
+        return new Class(name, methods, getters);
     }
 
     private Stmt VarDeclaration() {
@@ -72,9 +79,21 @@ public class Parser {
 
     private Stmt Method(string kind) {
         bool isStatic = Match(TokenType.Static);
-
         Token name = Consume(TokenType.Identifier, $"Expect {kind} name.");
-        return new Function(name, FunctionBody(kind), isStatic);
+        if (Peek().type == TokenType.Left_Paren) {
+            return new Function(name, FunctionBody(kind), isStatic);
+        }
+        if (isStatic) {
+            Error(name, $"A getter cannot be declared as static.");
+        }
+        return Getter();
+    }
+
+    private Stmt Getter() {
+        Token name = Previous();
+        Consume(TokenType.Left_Brace, "Expect '{' after getter name.");
+        List<Stmt> statements = Block();
+        return new Getter(name, statements);
     }
 
     private Stmt Statement() {
