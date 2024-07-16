@@ -34,7 +34,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         
         foreach (Function method in stmt.methods) {
             bool isInit = method.name.lexeme == "init";
-            LoxFunction function = new LoxFunction(method, this._environment, isInit);
+            LoxFunction function = new LoxFunction(method, this._environment, isInit, method.isStatic);
             methods.Add(method.name.lexeme, function);
         }
 
@@ -111,7 +111,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
 
     public object VisitFunctionStmt(Function stmt) {
         // Declaring a function
-        var function = new LoxFunction(stmt, _environment, false);
+        var function = new LoxFunction(stmt, _environment, false, false);
         if (_environment == null) {
             AssignGlobalValue(stmt.name, function);
         }
@@ -300,7 +300,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         // Visiting the function body
         Token name = new Token(TokenType.Nil, null!, null!, 0);
         Function function = new Function(name, expr);
-        return new LoxFunction(function, _environment, false);
+        return new LoxFunction(function, _environment, false, false);
     }
 
     public object VisitThisExpr(This expr) {

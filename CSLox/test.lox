@@ -1,14 +1,22 @@
-class Test {
-    init() {
-        return;
+class Math {
+    static square(n) {
+        return n * n;
+    }
+    sum(a, b){
+        return a + b;
     }
 }
 
-var test = Test();
-print test.init();
-
-fun init() {
-    return "good";
+/*
+static fun test() {
+    print "bad";
 }
 
-print init();
+test();
+*/
+
+var math = Math();
+print math.sum(5, 9);
+
+print Math.square(2);
+

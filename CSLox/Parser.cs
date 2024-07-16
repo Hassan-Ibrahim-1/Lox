@@ -47,7 +47,7 @@ public class Parser {
         List<Function> methods = new List<Function>();
         
         while (!Check(TokenType.Right_Brace) && !IsAtEnd()) {
-            methods.Add((Function)Function("method"));
+            methods.Add((Function)Method("method"));
         }
 
         Consume(TokenType.Right_Brace, "Expect '}' after class body.");
@@ -68,6 +68,13 @@ public class Parser {
     private Stmt Function(string kind) {
         Token name = Consume(TokenType.Identifier, $"Expect {kind} name.");
         return new Function(name, FunctionBody(kind));
+    }
+
+    private Stmt Method(string kind) {
+        bool isStatic = Match(TokenType.Static);
+
+        Token name = Consume(TokenType.Identifier, $"Expect {kind} name.");
+        return new Function(name, FunctionBody(kind), isStatic);
     }
 
     private Stmt Statement() {
@@ -433,6 +440,11 @@ public class Parser {
             throw Error(oper, "Expect left operand");
 
         }
+
+        if (Match(TokenType.Static)) {
+            throw Error(Previous(), "The static keyword can only be used for class methods.");
+        }
+
         // No valid expression found
         throw Error(Peek(), "Expect expression.");
     }
@@ -495,7 +507,8 @@ public class Parser {
             switch(Peek().type) {
                 case TokenType.Class: case TokenType.For: case TokenType.Fun:
                 case TokenType.If: case TokenType.Print: case TokenType.Var:
-                case TokenType.Return: case TokenType.While:
+                case TokenType.Return: case TokenType.While: case TokenType.Break:
+                case TokenType.Static:
                     return;
             }
             Next();

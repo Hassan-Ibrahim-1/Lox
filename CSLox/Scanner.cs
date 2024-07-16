@@ -25,6 +25,7 @@ public class Scanner {
         { "var",       TokenType.Var },
         { "while",     TokenType.While },
         { "break",     TokenType.Break},
+        { "static",    TokenType.Static}
     };
 
     public Scanner (string source) {

@@ -93,10 +93,12 @@ public class Break : Stmt {
 public class Function : Stmt {
     public readonly Token name;
     public readonly FunctionExpr functionExpr;
+    public readonly bool isStatic;
 
-    public Function(Token name, FunctionExpr functionExpr) {
+    public Function(Token name, FunctionExpr functionExpr, bool isStatic = false) {
         this.name = name;
         this.functionExpr = functionExpr;
+        this.isStatic = isStatic;
     }
     public override R Accept<R>(IStmtVisitor<R> visitor) {
         return visitor.VisitFunctionStmt(this);

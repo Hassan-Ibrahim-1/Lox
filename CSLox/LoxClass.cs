@@ -1,19 +1,19 @@
 namespace Lox;
 
-public class LoxClass : ILoxCallable {
+public class LoxClass : LoxInstance, ILoxCallable {
     public readonly string name;
     private readonly Dictionary<string, LoxFunction> methods;
 
     public LoxClass(string name, Dictionary<string, LoxFunction> methods) {
         this.name = name;
         this.methods = methods;
+        SetLoxClass(this);
     }
 
     public LoxFunction FindMethod(string name) {
         if (methods.TryGetValue(name, out LoxFunction? method)) {
             return method;
         }
-
         return null!;
     }
 

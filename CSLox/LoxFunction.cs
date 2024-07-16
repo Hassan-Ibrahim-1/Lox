@@ -1,15 +1,18 @@
 namespace Lox;
 
 public class LoxFunction : ILoxCallable {
+    public readonly bool isStatic;
+
     private readonly Function _declaration;
     // Scope where the function is declared in
     private readonly Environment _closure;
     private readonly bool _isInitializer;
 
-    public LoxFunction(Function declaration, Environment closure, bool isInitializer) {
+    public LoxFunction(Function declaration, Environment closure, bool isInitializer, bool isStatic) {
         this._declaration = declaration;
         this._closure = closure;
         this._isInitializer = isInitializer;
+        this.isStatic = isStatic;
     }
 
     /// Bind an instance of a class to a newly created environment in the method when called
@@ -17,7 +20,7 @@ public class LoxFunction : ILoxCallable {
     public LoxFunction Bind(LoxInstance instance) {
         Environment environment = new Environment(_closure);
         environment.Define(instance);
-        return new LoxFunction(_declaration, environment, _isInitializer);
+        return new LoxFunction(_declaration, environment, _isInitializer, isStatic);
     }
 
     public object Call(Interpreter interpreter, List<object> arguments) {
