@@ -1,17 +1,3 @@
-class Circle {
-    init(radius) {
-        this.radius = radius;
-    }
-
-    area {
-        return 3.14 * this.radius * this.radius;
-    }
-    static test() {
-        return 5 * 2;    
-    }
-}
-
-var circle = Circle(4);
-print circle.area;
-
-print Circle.test();
+var x = 2;
+x = x * x;
+print x;

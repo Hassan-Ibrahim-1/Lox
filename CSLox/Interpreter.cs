@@ -72,8 +72,9 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         if (stmt.initializer != null) {
             value = Evaluate(stmt.initializer);
         }
+        // global
         if (_environment == null) {
-            AssignGlobalValue(stmt.name, value);
+            _globals.Add(stmt.name.lexeme, value); // Define and assign
         }
 
         else {
@@ -150,7 +151,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         }
         // globals
         else {
-            GetGlobalValue(expr.name);
+            AssignGlobalValue(expr.name, value);
         }
 
         return value;
@@ -371,11 +372,10 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     }
 
     private void AssignGlobalValue(Token name, object value) {
-        if (_globals.ContainsKey(name.lexeme)) {
-            throw new RuntimeError(name, $"Global '{name.lexeme}' has already been defined.");
+        if (!_globals.ContainsKey(name.lexeme)) {
+            throw new RuntimeError(name, $"Global variable '{name.lexeme}' does not exist.");
         }
-        
-        _globals.Add(name.lexeme, value);
+        _globals[name.lexeme] = value;
     }
 
     private object Evaluate(Expr expr) {
