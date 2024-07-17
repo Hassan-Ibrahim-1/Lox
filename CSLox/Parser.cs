@@ -452,6 +452,12 @@ public class Parser {
             // TODO: maybe call this lambda?
             return FunctionBody("function");
         }
+        if (Match(TokenType.Super)) {
+            Token keyword = Previous();
+            Consume(TokenType.Dot, "Expect '.' after 'super'.");
+            Token method = Consume(TokenType.Identifier, "Expect superclass method name.");
+            return new Super(keyword, method);
+        }
         if (Match(TokenType.Left_Paren)) {
             Expr expr = Expression();
             Consume(TokenType.Right_Paren, "Expect ')' after expression.");

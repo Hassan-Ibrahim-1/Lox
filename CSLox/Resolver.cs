@@ -132,6 +132,12 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
             Resolve(stmt.superclass);
         }
 
+        // New scope surrounding methods
+        if (stmt.superclass != null) {
+            BeginScope();
+            scopes.Peek().Put("super", VarState.Read);
+        }
+
         // The entire class has its own separate scope
         // this is declared as a class-wide variable
         BeginScope();
@@ -152,6 +158,11 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
         }
 
         EndScope();
+
+        if (stmt.superclass != null) {
+            EndScope();
+        }
+
         _currentClass = enclosingClass;
         return null!;
     }
@@ -304,6 +315,18 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
             return null!;
         }
 
+        ResolveLocal(expr, expr.keyword);
+        return null!;
+    }
+
+    public object VisitSuperExpr(Super expr) {
+        if (_currentClass == ClassType.None) {
+            Lox.Error(expr.keyword, "'super' statement cannot be outside a class");
+            return null!;
+        }
+        
+        // Resolves what class a super expression refers to
+        // -ie how far away the superclass is
         ResolveLocal(expr, expr.keyword);
         return null!;
     }

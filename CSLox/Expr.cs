@@ -14,6 +14,7 @@ public interface IVisitor<R> {
     R VisitGetExpr(Get expr);
     R VisitSetExpr(Set expr);
     R VisitThisExpr(This expr);
+    R VisitSuperExpr(Super expr);
 }
 
 public abstract class Expr {
@@ -168,16 +169,25 @@ public class Set : Expr {
         return visitor.VisitSetExpr(this);
     }
 }
-
 public class This : Expr {
     public readonly Token keyword;
 
     public This(Token keyword) {
         this.keyword = keyword;
     }
-
     public override R Accept<R>(IVisitor<R> visitor) {
         return visitor.VisitThisExpr(this);
     }
 }
+public class Super : Expr {
+    public readonly Token keyword;
+    public readonly Token method;
 
+    public Super(Token keyword, Token method) {
+        this.keyword = keyword;
+        this.method = method;
+    }
+    public override R Accept<R>(IVisitor<R> visitor) {
+        return visitor.VisitSuperExpr(this);
+    }
+}

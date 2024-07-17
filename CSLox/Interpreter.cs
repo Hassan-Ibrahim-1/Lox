@@ -39,6 +39,11 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
             }
         }
 
+        if (stmt.superclass != null) {
+            _environment = new Environment(_environment);
+            _environment.Define(superclass);
+        }
+
         Dictionary<string, LoxFunction> methods = new Dictionary<string, LoxFunction>();       
         Dictionary<string, LoxGetter> getters = new Dictionary<string, LoxGetter>();
         
@@ -54,6 +59,10 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
 
         LoxClass loxClass = new LoxClass(stmt.name.lexeme, (LoxClass)superclass, methods, getters);
 
+        if (superclass != null) {
+            _environment = _environment.enclosing;
+        }
+        
         if (_environment == null) {
             _globals.Add(stmt.name.lexeme, loxClass);
         }
@@ -147,7 +156,6 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     }
 
     public object VisitGetterStmt(Getter stmt) {
-        // TODO: why?
         LoxGetter getter = new LoxGetter(stmt, _environment);
         _environment.Define(getter);
         return null!;
@@ -330,9 +338,29 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     }
 
     public object VisitThisExpr(This expr) {
-        // the 'this' keyword is used to lookup the variable because that's what the variabled is declared as in resolver
+        // the 'this' keyword is used to lookup the variable because that's what the variable is declared as in resolver
         // this is a reference to a class instance
         return LookUpVariable(expr.keyword, expr);
+    }
+
+    public object VisitSuperExpr(Super expr) {
+        int? distance = _locals.Get(expr);
+        LoxClass superclass = (LoxClass)_environment.GetAt(_localIndices[expr], distance);
+
+        // The instance that is calling the super expression
+        LoxInstance instance = (LoxInstance)_environment.GetAt(0, distance - 1);
+
+        LoxFunction method = superclass.FindMethod(expr.method.lexeme);
+        if (method != null) {
+            return method.Bind(instance);
+        }
+        
+        LoxGetter getter = superclass.FindGetter(expr.method.lexeme);
+        if (getter != null) {
+            return getter.Bind(instance).Call(this);
+        }
+
+        throw new RuntimeError(expr.method, $"Undefined property {expr.method.lexeme}.");
     }
 
     private static bool IsTrue(object obj) {
