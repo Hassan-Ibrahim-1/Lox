@@ -46,7 +46,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         LoxClass loxClass = new LoxClass(stmt.name.lexeme, methods, getters);
 
         if (_environment == null) {
-            AssignGlobalValue(stmt.name, loxClass);
+            _globals.Add(stmt.name.lexeme, loxClass);
         }
         else {
             _environment.Define(loxClass);
@@ -119,7 +119,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
         // Declaring a function
         var function = new LoxFunction(stmt, _environment, false, false);
         if (_environment == null) {
-            AssignGlobalValue(stmt.name, function);
+            _globals.Add(stmt.name.lexeme, function);
         }
         else {
             _environment.Define(function);

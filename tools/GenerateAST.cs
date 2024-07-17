@@ -33,7 +33,7 @@ public class GenerateAST {
                 "Function : Token name, FunctionExpr functionExpr, bool isStatic",
                 "Getter : Token name, List<Stmt> statements",
                 "Return : Token keyword, Expr value",
-                "Class : Token name, List<Function> methods, List<Getter> getters",
+                "Class : Token name, Variable superclass, List<Function> methods, List<Getter> getters",
             });
     }
 

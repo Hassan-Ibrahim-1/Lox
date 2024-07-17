@@ -301,9 +301,9 @@ public class Parser {
         }
         Expr expr = Or();
 
-        if (Match(TokenType.Ternary_Question)) {
+        if (Match(TokenType.Question)) {
             Expr thenBranch = Ternary();
-            Consume(TokenType.Ternary_Colon, "Expect ':' after then branch.");
+            Consume(TokenType.Colon, "Expect ':' after then branch.");
             Expr elseBranch = Ternary();
             return new Ternary(expr, thenBranch, elseBranch);
         }        

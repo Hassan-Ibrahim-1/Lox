@@ -1,3 +1,13 @@
-var x = 2;
-x = x * x;
-print x;
+class Test {
+    test {
+        return "it works!";
+    }
+    static testMethod() {
+        return 1;
+    }
+}
+
+print Test.testMethod();
+var test = Test();
+
+print test.test;

@@ -55,8 +55,8 @@ public class Scanner {
             case '-': AddToken(TokenType.Minus); break;
             case '*': AddToken(TokenType.Star); break;
             case ';': AddToken(TokenType.SemiColon); break;
-            case '?': AddToken(TokenType.Ternary_Question); break;
-            case ':': AddToken(TokenType.Ternary_Colon); break;
+            case '?': AddToken(TokenType.Question); break;
+            case ':': AddToken(TokenType.Colon); break;
 
             case '!': 
                 AddToken(Match('=') ? TokenType.Bang_Equal : TokenType.Bang);

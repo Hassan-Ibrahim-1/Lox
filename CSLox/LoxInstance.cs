@@ -35,7 +35,7 @@ public class LoxInstance {
         }
 
         LoxGetter getter = _loxClass.FindGetter(name.lexeme);
-        if (getter != null) {
+        if (getter != null && !_staticInstance) {
             return getter.Bind(this);
         }
 
