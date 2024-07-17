@@ -13,7 +13,8 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
 
     private enum ClassType {
         None,
-        Class
+        Class,
+        Subclass
     }
 
     private enum VarState {
@@ -129,6 +130,7 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
                 Lox.Error(stmt.superclass.name, "A class can't inherit from itself.");
             }
 
+            _currentClass = ClassType.Subclass;
             Resolve(stmt.superclass);
         }
 
@@ -322,7 +324,10 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
     public object VisitSuperExpr(Super expr) {
         if (_currentClass == ClassType.None) {
             Lox.Error(expr.keyword, "'super' statement cannot be outside a class");
-            return null!;
+        }
+
+        if (_currentClass != ClassType.Subclass) {
+            Lox.Error(expr.keyword, "Can't use 'super' in a class with no superclass");
         }
         
         // Resolves what class a super expression refers to
