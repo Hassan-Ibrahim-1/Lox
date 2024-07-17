@@ -445,7 +445,24 @@ public class Parser {
         }
         if (Match(TokenType.Identifier)) {
             // The identifier that just got matched
-            return new Variable(Previous());
+            Token identifier = Previous();
+            Variable variable = new Variable(identifier);
+
+            // i++
+            if (Match(TokenType.Plus_Plus)) {
+                Token op = new Token(TokenType.Plus, "+", null!, Previous().line);
+                // i + 1
+                Binary expr = new Binary((Expr)variable, op, new Literal(1d));
+                return new Assignment(variable.name, expr);
+            }
+            // i--
+            if (Match(TokenType.Minus_Minus)) {
+                Token op = new Token(TokenType.Minus, "-", null!, Previous().line);
+                Binary expr = new Binary(variable, op, new Literal(1d));
+                return new Assignment(variable.name, expr);
+            }
+
+            return variable;
         }
         // Anonymous function
         if (Match(TokenType.Fun)) {

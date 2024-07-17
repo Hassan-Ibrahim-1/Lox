@@ -51,8 +51,22 @@ public class Scanner {
             case '}': AddToken(TokenType.Right_Brace); break;
             case ',': AddToken(TokenType.Comma); break;
             case '.': AddToken(TokenType.Dot); break;
-            case '+': AddToken(TokenType.Plus); break;
-            case '-': AddToken(TokenType.Minus); break;
+            case '+':
+                if (Match('+')) {
+                    AddToken(TokenType.Plus_Plus);
+                }
+                else {
+                    AddToken(TokenType.Plus);
+                }
+                break;
+            case '-':
+                if (Match('-')) {
+                    AddToken(TokenType.Minus_Minus);
+                }
+                else {
+                    AddToken(TokenType.Minus);
+                }
+                break;
             case '*': AddToken(TokenType.Star); break;
             case ';': AddToken(TokenType.SemiColon); break;
             case '?': AddToken(TokenType.Question); break;

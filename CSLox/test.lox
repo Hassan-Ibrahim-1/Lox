@@ -1,8 +1,7 @@
-class Eclair {
-    cook() {
-        super.cook();
-        print "test";
-    }
+for (var i = 10; i > 0; i--) {
+    print i;
 }
 
-Eclair().cook();
+var x = 5;
+
+print x--;
