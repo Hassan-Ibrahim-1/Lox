@@ -1,13 +1,15 @@
-class Test {
-    test {
-        return "it works!";
+class Parent {
+    Test() {
+        return "parent class";
     }
-    static testMethod() {
-        return 1;
+    get {
+        return "parent getter";
     }
 }
 
-print Test.testMethod();
-var test = Test();
+class Child < Parent {}
 
-print test.test;
+var child = Child();
+
+print child.Test();
+print child.get;

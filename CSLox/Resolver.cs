@@ -123,6 +123,15 @@ public class Resolver : IVisitor<object>, IStmtVisitor<object> {
     public object VisitClassStmt(Class stmt) {
         Declare(stmt.name);
         Define(stmt.name);
+
+        if (stmt.superclass != null) {
+            if (stmt.superclass.name.lexeme == stmt.name.lexeme) {
+                Lox.Error(stmt.superclass.name, "A class can't inherit from itself.");
+            }
+
+            Resolve(stmt.superclass);
+        }
+
         // The entire class has its own separate scope
         // this is declared as a class-wide variable
         BeginScope();

@@ -30,6 +30,15 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
     }
    
     public object VisitClassStmt(Class stmt) {
+        object superclass = null!;
+
+        if (stmt.superclass != null) {
+            superclass = Evaluate(stmt.superclass);
+            if (!(superclass is LoxClass)) {
+                throw new RuntimeError(stmt.superclass.name, "Superclass must be a class.");
+            }
+        }
+
         Dictionary<string, LoxFunction> methods = new Dictionary<string, LoxFunction>();       
         Dictionary<string, LoxGetter> getters = new Dictionary<string, LoxGetter>();
         
@@ -43,7 +52,7 @@ public class Interpreter : IVisitor<object>, IStmtVisitor<object> {
             getters.Add(getter.name.lexeme, new LoxGetter(getter, _environment));
         }
 
-        LoxClass loxClass = new LoxClass(stmt.name.lexeme, methods, getters);
+        LoxClass loxClass = new LoxClass(stmt.name.lexeme, (LoxClass)superclass, methods, getters);
 
         if (_environment == null) {
             _globals.Add(stmt.name.lexeme, loxClass);

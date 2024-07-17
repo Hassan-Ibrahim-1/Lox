@@ -131,11 +131,13 @@ public class Return : Stmt {
 }
 public class Class : Stmt {
     public readonly Token name;
+    public readonly Variable superclass;
     public readonly List<Function> methods;
     public readonly List<Getter> getters;
 
-    public Class(Token name, List<Function> methods, List<Getter> getters) {
+    public Class(Token name, Variable superclass, List<Function> methods, List<Getter> getters) {
         this.name = name;
+        this.superclass = superclass;
         this.methods = methods;
         this.getters = getters;
     }
