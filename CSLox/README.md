@@ -10,6 +10,6 @@
 - Expression support in the REPL
 - Allow for strings to be added to non string types ie: ("1" + 1 = "11")
 ## Changes
-- Disallow repeat declaration in the same scope
+- Disallow variable redeclaration in the same scope (doesn't include child scopes)
 - An array is used instead of a hashmap to store values in the Environment class
 - Division by zero error
