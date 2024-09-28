@@ -1,0 +1,8 @@
+# Specific to c files
+If:
+  PathMatch: [.*\.c, .*\.h]
+CompileFlags:
+  Add [-xc, -Wall]
+  Add -I/usr/local/Cellar/glfw/3.4/include/
+  Add -I/usr/local/Cellar/glad/include
+  Compiler clang

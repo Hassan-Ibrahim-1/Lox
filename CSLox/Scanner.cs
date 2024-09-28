@@ -249,6 +249,7 @@ public class Scanner {
     }
 
     private void AddToken(TokenType type, object literal) {
+        Console.WriteLine($"Adding token of type {type}");
         String lexeme = _source.Substring(_start, _current - _start);
         _tokens.Add(new Token(type, lexeme, literal, _line));
     }

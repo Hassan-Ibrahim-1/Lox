@@ -1,7 +1,8 @@
-for (var i = 10; i > 0; i--) {
-    print i;
+class Test {
+    static test(x) {
+        print x;
+    }
 }
 
-var x = 5;
+Test.test("static test");
 
-print x--;
