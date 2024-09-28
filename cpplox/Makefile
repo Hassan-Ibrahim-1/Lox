@@ -9,14 +9,20 @@ EXE = main
 # C compiler
 CC = clang
 # C++ compiler
-CXX = g++
+CXX = clang++
 # linker
-LD = clang
+LD = clang++
 
 # C flags
-CFLAGS = -Wall -W
+CFLAGS = 
+
 # C++ flags
-CXXFLAGS = 
+
+# debug flags
+CXXFLAGS = -Wall -W -std=c++17 --debug -gfull
+# release flags
+# CXXFLAGS = -Wall -W -std=c++17 -O3 -DNDEBUG
+
 # C/C++ flags
 CPPFLAGS = -Wall
 # dependency-generation flags
@@ -30,6 +36,8 @@ LDLIBS =
 BIN = bin
 OBJ = obj
 SRC = src
+
+SRCFILE = src/test.lox
 
 SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*.cc $(SRC)/*.cpp $(SRC)/*.cxx)
 
@@ -87,6 +95,10 @@ remake:	clean $(BIN)/$(EXE)
 run: $(BIN)/$(EXE)
 	./$(BIN)/$(EXE)
 
+.PHONY: repl
+repl: $(BIN)/$(EXE)
+	./$(BIN)/$(EXE)
+
 # remove previous build and objects
 .PHONY: clean
 clean:
@@ -99,5 +111,3 @@ clean:
 reset:
 	$(RM) -r $(OBJ)
 	$(RM) -r $(BIN)
-
--include $(DEPENDS)
