@@ -3,7 +3,9 @@
 
 int main() {
     Chunk* chunk = new Chunk;
-    chunk->write(OP_RETURN);
+    size_t constant = chunk->add_constant(1.2);
+    chunk->write(OP_CONSTANT);
+    chunk->write(constant);
     disassemble_chunk(*chunk, "test chunk");
     delete chunk;
 
