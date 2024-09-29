@@ -17,10 +17,8 @@ LD = clang++
 CFLAGS = 
 
 # C++ flags
-DEPDIR = dependencies
-
 # debug flags
-CXXFLAGS = -Wall -W -std=c++17 --debug -gfull -I$(DEPDIR)/ -Lcatch -I/opt/homebrew/Cellar/catch2/3.7.1/include/
+CXXFLAGS = -Wall -W -std=c++17 --debug -gfull
 # release flags
 # CXXFLAGS = -Wall -W -std=c++17 -O3 -DNDEBUG
 
@@ -38,18 +36,15 @@ BIN = bin
 OBJ = obj
 SRC = src
 
-CATCHSRC = $(DEPDIR)/*.cxx
-
 SRCFILE = src/test.lox
 
-SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*.cc $(SRC)/*.cpp $(SRC)/*.cxx $(CATCHSRC))
+SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*.cc $(SRC)/*.cpp $(SRC)/*.cxx)
 
 OBJECTS := \
 	$(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(wildcard $(SRC)/*.c)) \
 	$(patsubst $(SRC)/%.cc, $(OBJ)/%.o, $(wildcard $(SRC)/*.cc)) \
 	$(patsubst $(SRC)/%.cpp, $(OBJ)/%.o, $(wildcard $(SRC)/*.cpp)) \
 	$(patsubst $(SRC)/%.cxx, $(OBJ)/%.o, $(wildcard $(SRC)/*.cxx)) \
-	$(patsubst $(DEPDIR)/%.cxx, $(OBJ)/%.o, $(wildcard $(DEPDIR)/*.cxx))
 
 # include compiler-generated dependency rules
 DEPENDS := $(OBJECTS:.o=.d)
@@ -88,9 +83,6 @@ $(OBJ)/%.o:	$(SRC)/%.cpp
 	$(COMPILE.cxx) $<
 
 $(OBJ)/%.o:	$(SRC)/%.cxx
-	$(COMPILE.cxx) $<
-
-$(OBJ)/%.o:	$(DEPDIR)/%.cxx
 	$(COMPILE.cxx) $<
 
 # force rebuild
