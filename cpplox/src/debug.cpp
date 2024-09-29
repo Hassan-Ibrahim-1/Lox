@@ -28,15 +28,15 @@ size_t disassemble_instruction(const Chunk& chunk, size_t offset) {
     }
     u8 instruction = chunk.code[offset];
     switch (instruction) {
-    case OP_RETURN:
-        return simple_instruction("OP_RETURN", offset);
-    case OP_CONSTANT:
-        return constant_instruction("OP_CONSTANT", chunk, offset);
-    case OP_CONSTANT_LONG:
-        return long_constant_instruction("OP_CONSTANT_LONG", chunk, offset);
-    default:
-        printf("Unknown opcode: %u\n", instruction);
-        return offset+1;
+        case OP_RETURN:
+            return simple_instruction("OP_RETURN", offset);
+        case OP_CONSTANT:
+            return constant_instruction("OP_CONSTANT", chunk, offset);
+        case OP_CONSTANT_LONG:
+            return long_constant_instruction("OP_CONSTANT_LONG", chunk, offset);
+        default:
+            printf("Unknown opcode: %u\n", instruction);
+            return offset+1;
     }
 }
 
