@@ -11,10 +11,8 @@ int main() {
     size_t constant2 = chunk->add_constant(7);
     chunk->write(OP_CONSTANT, 123);
     chunk->write(constant, 123);
-    chunk->write(OP_CONSTANT, 123);
-    chunk->write(constant2, 123);
+    chunk->write(OP_NEGATE, 123);
     chunk->write(OP_RETURN, 123);
-    chunk->write(OP_RETURN, 142);
     if (vm.interpret(chunk) == INTERPRET_OK) {
         printf("INTERPRET_OK\n");
     }

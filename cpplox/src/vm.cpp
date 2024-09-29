@@ -72,6 +72,10 @@ InterpretResult VM::run() {
                 printf("\n");
                 break;
             }
+            case OP_NEGATE: {
+                push(-pop());
+                break;
+            }
         }
     }
 }
