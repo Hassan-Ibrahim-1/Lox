@@ -5,6 +5,7 @@
 
 static size_t simple_instruction(const std::string& op_name, size_t offset);
 static size_t constant_instruction(const std::string& op_name, const Chunk& chunk, size_t offset);
+static size_t long_constant_instruction(const std::string& op_name, const Chunk& chunk, size_t offset);
 
 void disassemble_chunk(const Chunk& chunk, const std::string& name) {
     printf("== %s ==\n", name.c_str());
@@ -31,6 +32,8 @@ size_t disassemble_instruction(const Chunk& chunk, size_t offset) {
         return simple_instruction("OP_RETURN", offset);
     case OP_CONSTANT:
         return constant_instruction("OP_CONSTANT", chunk, offset);
+    case OP_CONSTANT_LONG:
+        return long_constant_instruction("OP_CONSTANT_LONG", chunk, offset);
     default:
         printf("Unknown opcode: %u\n", instruction);
         return offset+1;
@@ -48,5 +51,16 @@ static size_t constant_instruction(const std::string& op_name, const Chunk& chun
     print_value(chunk.values[const_index]);
     printf("'\n");
     return offset + 2;
+}
+
+static size_t long_constant_instruction(const std::string& op_name, const Chunk& chunk, size_t offset) {
+    u32 const_index =
+        (chunk.code[offset + 1]) |
+        (chunk.code[offset + 2] << 8) |
+        (chunk.code[offset + 3] << 16);
+    printf("%-16s %4d '", op_name.c_str(), const_index);
+    print_value(chunk.values[const_index]);
+    printf("'\n");
+    return offset + 4;
 }
 

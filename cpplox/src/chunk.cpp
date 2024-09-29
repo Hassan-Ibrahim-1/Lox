@@ -15,6 +15,19 @@ void Chunk::write(u8 byte, int line) {
     }
 }
 
+void Chunk::write_constant(Value value, int line) {
+    size_t const_index = add_constant(value);
+    if (const_index > 255) {
+        write(OP_CONSTANT_LONG, line);
+        write((u8) ((const_index)       & 0xff), line);
+        write((u8) ((const_index >> 8)  & 0xff), line);
+        write((u8) ((const_index >> 16) & 0xff), line);
+    }
+    else {
+        write(OP_CONSTANT, line);
+    }
+}
+
 size_t Chunk::add_constant(Value value) {
     values.push_back(value);
     return values.size() - 1;

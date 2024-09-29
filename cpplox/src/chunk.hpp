@@ -6,6 +6,7 @@
 
 enum OpCode {
     OP_CONSTANT,
+    OP_CONSTANT_LONG,
     OP_RETURN,
 };
 
@@ -24,6 +25,7 @@ struct Chunk {
     std::vector<Value> values;
 
     void write(u8 byte, int line);
+    void write_constant(Value value, int line);
     size_t add_constant(Value value);
     int get_line(size_t code_index) const;
 };
