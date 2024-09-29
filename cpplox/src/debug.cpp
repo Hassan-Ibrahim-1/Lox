@@ -15,6 +15,16 @@ void disassemble_chunk(const Chunk& chunk, const std::string& name) {
 
 size_t disassemble_instruction(const Chunk& chunk, size_t offset) {
     printf("%04zu ", offset);
+    if (offset > 0) {
+        int l1 = chunk.get_line(offset);
+        int l2 = chunk.get_line(offset-2);
+    }
+    if (offset > 0 && chunk.get_line(offset) == chunk.get_line(offset-1)) {
+        printf("   | ");
+    }
+    else {
+        printf("%4d ", chunk.get_line(offset));
+    }
     u8 instruction = chunk.code[offset];
     switch (instruction) {
     case OP_RETURN:
